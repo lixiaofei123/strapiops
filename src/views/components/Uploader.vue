@@ -1,8 +1,3 @@
-<!-- allowedTypes: ["images"]
-multiple: false
-required: false
-type: "media" -->
-
 <template>
     <div>
         <div class="image-container" v-if="attrbute.allowedTypes.length === 1 && attrbute.allowedTypes[0] === 'images'">
@@ -18,7 +13,8 @@ type: "media" -->
                     <el-image class="preview_image" :src="item.previewurl" fit="scale-down"></el-image>
                     <el-progress class="upload_progress" :percentage="item.uploadprogress" :show-text="false"
                         v-if="item.uploadprogress !== 100"></el-progress>
-                    <el-button class="delete_img_btn" type="danger" icon="el-icon-delete" circle v-if="item.uploadprogress===100" size="mini" @click="deleteImage(item.key)"> </el-button>
+                    <el-button class="delete_img_btn" type="danger" icon="el-icon-delete" circle
+                        v-if="item.uploadprogress === 100" size="mini" @click="deleteImage(item.key)"> </el-button>
                 </div>
             </div>
 
@@ -52,7 +48,8 @@ export default {
     props: {
         attrbute: Object,
         metadata: Object,
-        attrbute_name: String
+        attrbute_name: String,
+        init_images: [Object, Array]
     },
     data() {
         return {
@@ -68,60 +65,104 @@ export default {
         };
     },
     mounted() {
-        setTimeout(() => {
-            let description = this.metadata.description
-            let limitsize = this.checkPattern(description)
-            if (limitsize) {
-                let arr = description.split("x")
-                let width = parseInt(arr[0])
-                let height = parseInt(arr[1])
-                this.limitsize = true
-                this.width = width
-                this.height = height
-            }
 
-            this.$refs.upload_btn.addEventListener('change', e => {
-                var files = e.target.files;
-                let done = (url, filename) => {
-                    if (this.limitsize) {
-                        this.filename = filename
-                        this.src_image_url = url
-                        this.showImageCropDialog = true
-                        setTimeout(() => {
-                            this.cropper = new Cropper(this.$refs.src_image, {
-                                aspectRatio: this.width / this.height,
-                                minCropBoxWidth: 200
-                            });
-                        }, 100)
-                    } else {
-                        // 直接上传
-                        if (files && files.length > 0) {
-                            let file = files[0]
-                            let filename = file.name
-                            this.uploadData(url, filename, file)
-                        }
+        this.init_preview_images()
+        this.init_uploader();
 
-                    }
-                };
-                if (files && files.length > 0) {
-                    let file = files[0];
-                    let filename = file.name
-                    if (URL) {
-                        done(URL.createObjectURL(file), filename);
-                    } else if (FileReader) {
-                        reader = new FileReader();
-                        reader.onload = (e) => {
-                            done(reader.result, filename);
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                }
-
-            })
-        }, 100)
 
     },
     methods: {
+        init_uploader() {
+            setTimeout(() => {
+                let description = this.metadata.description
+                let limitsize = this.checkPattern(description)
+                if (limitsize) {
+                    let arr = description.split("x")
+                    let width = parseInt(arr[0])
+                    let height = parseInt(arr[1])
+                    this.limitsize = true
+                    this.width = width
+                    this.height = height
+                }
+
+                this.$refs.upload_btn.addEventListener('change', e => {
+                    var files = e.target.files;
+                    let done = (url, filename) => {
+                        if (this.limitsize) {
+                            this.filename = filename
+                            this.src_image_url = url
+                            this.showImageCropDialog = true
+                            setTimeout(() => {
+                                this.cropper = new Cropper(this.$refs.src_image, {
+                                    aspectRatio: this.width / this.height,
+                                    minCropBoxWidth: 200
+                                });
+                            }, 100)
+                        } else {
+                            // 直接上传
+                            if (files && files.length > 0) {
+                                let file = files[0]
+                                let filename = file.name
+                                this.uploadData(url, filename, file)
+                            }
+
+                        }
+                    };
+                    if (files && files.length > 0) {
+                        let file = files[0];
+                        let filename = file.name
+                        if (URL) {
+                            done(URL.createObjectURL(file), filename);
+                        } else if (FileReader) {
+                            reader = new FileReader();
+                            reader.onload = (e) => {
+                                done(reader.result, filename);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    }
+
+                })
+            }, 100)
+        },
+        getPreviewUrl(image) {
+            if (image.formats) {
+                if (image.formats.thumbnail) {
+                    return image.formats.thumbnail.url
+                }
+                if (image.formats.small) {
+                    return image.formats.small.url
+                }
+                if (image.formats.medium) {
+                    return image.formats.medium.url
+                }
+            }
+            return image.url
+        },
+        init_preview_images() {
+            if (this.init_images) {
+                if (this.init_images.length) {
+                    for (let i = 0; i < this.init_images.length; i++) {
+                        let image = this.init_images[i]
+                        this.uploadList.push({
+                            key: image.id,
+                            previewurl: this.getPreviewUrl(image),
+                            uploadprogress: 100,
+                            data: image
+                        })
+                    }
+                } else {
+                    let image = this.init_images
+                    this.uploadList.push({
+                        key: image.id,
+                        previewurl: this.getPreviewUrl(image),
+                        uploadprogress: 100,
+                        data: image
+                    })
+                }
+            }
+
+        },
         readyUploadFile() {
             if (this.canupload) {
                 this.$refs.upload_btn.click()
@@ -149,7 +190,7 @@ export default {
                 uploaditem.uploadprogress = 100
                 uploaditem.data = data[0]
                 this.$set(this.uploadList, index, uploaditem)
-                this.$emit('uploadsuccess',this.attrbute_name, data[0])
+                this.$emit('uploadsuccess', this.attrbute_name, data[0])
             })
         },
         clearUpload() {
@@ -171,17 +212,17 @@ export default {
             }
             this.showImageCropDialog = false
         },
-        deleteImage(key){
+        deleteImage(key) {
             let findindex = this.uploadList.findIndex(item => item.key === key)
-            if(findindex != -1){
+            if (findindex != -1) {
                 let delete_image = this.uploadList[findindex]
                 this.uploadList.splice(findindex, 1)
-                this.$emit('delete',this.attrbute_name, delete_image.data)
+                this.$emit('delete', this.attrbute_name, delete_image.data)
             }
         },
     },
     computed: {
-        canupload(){
+        canupload() {
             return !this.uploadding && ((this.uploadList.length > 0 && this.attrbute.multiple) || (this.uploadList.length === 0))
         },
     },
@@ -223,7 +264,7 @@ export default {
     bottom: 0px;
 }
 
-.delete_img_btn{
+.delete_img_btn {
     position: absolute;
     bottom: 5px;
     right: 5px;

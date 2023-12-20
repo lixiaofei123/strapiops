@@ -108,10 +108,10 @@ function get_content_configuration(model, resolve, reject) {
 function get_content_list(model, sort_by, sort_order, page, pageCount, resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
-  let url = `${config.url}/content-manager/collection-types/${model}?page=${page}&pageSize=${pageCount}`
-  if (sort_by) {
-    url = `${url}&$sort=${sort_by}:${sort_order}`
-  }
+  let url = `${config.url}/content-manager/collection-types/${model}?page=${page}&pageSize=${pageCount}&sort=id:DESC`
+  // if (sort_by) {
+  //   url = `${url}&$sort=${sort_by}:${sort_order}`
+  // }
 
   axios
     .get(url)
@@ -143,7 +143,7 @@ function upload(filename, file, progress, resolve, reject) {
         'Content-Type': 'multipart/form-data'
       },
       onUploadProgress(progressEvent) {
-        progress(progressEvent.loaded / progressEvent.total)
+        progress(progressEvent.loaded / progressEvent.total, progressEvent.loaded, progressEvent.total)
       }
     })
     .then((resp) => resolve(resp.data))
@@ -161,7 +161,33 @@ function save_model_data(model, modeldata, resolve, reject) {
     .catch((err) => reject(err));
 }
 
+function get_content_by_id(model, id, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  axios
+    .get(`${config.url}/content-manager/collection-types/${model}/${id}`)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
 
+function update_content_by_id(model, id, modeldata, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  axios
+    .put(`${config.url}/content-manager/collection-types/${model}/${id}`, modeldata)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+
+function publish_content(model, id, publish, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  axios
+    .post(`${config.url}/content-manager/collection-types/${model}/${id}/actions/${publish ? 'publish' : 'unpublish'}`)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
 
 export {
   myInfo,
@@ -171,6 +197,9 @@ export {
   get_content_configuration,
   get_content_list,
   delete_content_by_id,
+  get_content_by_id,
   upload,
-  save_model_data
+  save_model_data,
+  update_content_by_id,
+  publish_content
 };

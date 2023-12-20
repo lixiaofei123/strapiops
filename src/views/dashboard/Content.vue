@@ -17,7 +17,8 @@
 
       </CCardHeader>
       <CCardBody>
-        <ContentTable :fields="fields" :items="items" @deleteContent="deleteContent" @editContent="editContent"></ContentTable>
+        <ContentTable :fields="fields" :items="items" @deleteContent="deleteContent" @editContent="editContent"
+          @bool_value_changed="bool_value_changed"></ContentTable>
         <CPagination align="end" :active-page.sync="currentPage" :pages="page_count" />
         <br>
       </CCardBody>
@@ -29,9 +30,9 @@
 
 <script>
 
-import { get_content_configuration, get_content_list, delete_content_by_id } from "../../api/api";
+import { get_content_configuration, get_content_list, delete_content_by_id, publish_content } from "../../api/api";
 import ContentTable from "../components/ContentTable.vue"
-var moment = require('moment');
+import { format_timestamp } from "../../utils/utils"
 
 export default {
   name: "Content",
@@ -49,7 +50,8 @@ export default {
       sort_order: undefined,
       metadatas: undefined,
       model: "",
-      model_info: {}
+      model_info: {},
+      contenttype: undefined
     };
   },
   created() {
@@ -67,7 +69,6 @@ export default {
           this.clear();
           this.model = model
           this.load_model_info()
-          this.content_configuration()
         }
       }
     },
@@ -76,7 +77,7 @@ export default {
     }
   },
   methods: {
-    clear(){
+    clear() {
       this.fields = []
       this.items = []
       this.currentPage = 1
@@ -85,13 +86,16 @@ export default {
       this.sort_by = undefined
       this.sort_order = undefined
       this.metadatas = undefined
-      this.model =  ""
-      this.model_info=  {}
+      this.model = ""
+      this.model_info = {}
+      this.contenttype = undefined
     },
     load_model_info() {
       let contenttype = this.$store.getters.getContentTypeByUid(this.model)
       if (contenttype) {
         this.model_info = contenttype.info
+        this.contenttype = contenttype
+        this.content_configuration()
       } else {
         setTimeout(() => {
           this.load_model_info()
@@ -119,7 +123,7 @@ export default {
             let time = Date.parse(result)
             return {
               type: "string",
-              data: moment.unix(time / 1000).format("YYYY年MM月DD日 HH时mm分")
+              data: format_timestamp(time / 1000)
             }
           } else {
             return {
@@ -173,6 +177,10 @@ export default {
                 item[field] = value
 
               }
+              item['isPublish'] = {
+                type: "boolean",
+                data: results[i]["publishedAt"] !== null
+              }
               items.push(item)
             }
             this.items = items
@@ -205,13 +213,19 @@ export default {
         this.sort_by = setting.defaultSortBy
         this.sort_order = setting.defaultSortOrder
 
+        if (this.contenttype.options && this.contenttype.options.draftAndPublish) {
+          fields.push({
+            key: "isPublish",
+            label: "发布状态"
+          })
+        }
+
         this.load_content_list(1);
 
       })
     },
     deleteContent(itemid) {
       let displayName = this.model_info.displayName
-      console.log(displayName)
       this.$confirm(`您确定要删除ID为${itemid}的${displayName}吗?该操作不可撤销`).then(() => {
         delete_content_by_id(this.model, itemid, () => {
           // 重新加载此页
@@ -234,9 +248,58 @@ export default {
         });
       })
     },
-    editContent(itemid){
+    editContent(itemid) {
       this.$router.push({ path: `/contentEdit?model=${this.model}&itemid=${itemid}` });
     },
+    bool_value_changed(data, attr, newvalue) {
+      let displayName = this.model_info.displayName
+      if (attr === "isPublish") {
+        let findindex = this.items.findIndex(item => item === data)
+        if (findindex !== -1) {
+          let findid = this.items[findindex].id.data
+          if (newvalue) {
+            publish_content(this.model, findid, true, () => {
+              this.$notify({
+                title: '成功',
+                message: `发布${displayName}成功`,
+                type: 'success'
+              });
+            }, () => {
+              this.$notify({
+                title: "通知",
+                message: `发布'${displayName}失败`,
+              });
+              this.items[findindex][attr].data = false
+              this.$set(this.items, findindex, this.items[findindex])
+
+            })
+          } else {
+            this.$confirm(`您确定要取消ID为${findid}的${displayName}的发布状态吗？取消发布后，用户将无法查看到此条数据。`).then(() => {
+              publish_content(this.model, findid, false, () => {
+                this.$notify({
+                  title: '成功',
+                  message: `取消发布${displayName}成功`,
+                  type: 'success'
+                });
+              }, () => {
+                this.$notify({
+                  title: "通知",
+                  message: `取消发布'${displayName}失败`,
+                });
+                this.items[findindex][attr].data = true
+                this.$set(this.items, findindex, this.items[findindex])
+
+              })
+            }).catch(() => {
+              this.items[findindex][attr].data = true
+              this.$set(this.items, findindex, this.items[findindex])
+            })
+          }
+
+        }
+      }
+
+    }
   },
 };
 </script>
