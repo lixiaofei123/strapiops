@@ -10,7 +10,9 @@ import 'element-ui/lib/theme-chalk/index.css';
 import axios from 'axios';
 import VueClipboard from 'vue-clipboard2'
 import CKEditor from '@ckeditor/ckeditor5-vue2';
+import VueDND from 'awe-dnd'
 
+Vue.use(VueDND)
 Vue.config.performance = true
 Vue.use(CoreuiVue)
 Vue.use( CKEditor );

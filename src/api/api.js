@@ -108,7 +108,7 @@ function get_content_configuration(model, resolve, reject) {
 function get_content_list(model, sort_by, sort_order, page, pageCount, resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
-  let url = `${config.url}/content-manager/collection-types/${model}?page=${page}`
+  let url = `${config.url}/content-manager/collection-types/${model}?page=${page}&pageSize=${pageCount}`
   if (sort_by) {
     url = `${url}&$sort=${sort_by}:${sort_order}`
   }
@@ -189,6 +189,32 @@ function publish_content(model, id, publish, resolve, reject) {
     .catch((err) => reject(err));
 }
 
+function get_ralation_list(model, field, entityId, page, pageCount, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/content-manager/relations/${model}/${field}?&pageSize=${pageCount}&_q=&_filter=$startsWithi&page=${page}`
+  if (entityId) {
+    url = `${url}&entityId=${entityId}`
+  }
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+function get_ralation_list_by_id(model, field, entityId, page, pageCount, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/content-manager/relations/${model}/${entityId}/${field}?pageSize=${pageCount}&page=${page}`
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+
 export {
   myInfo,
   login,
@@ -201,5 +227,7 @@ export {
   upload,
   save_model_data,
   update_content_by_id,
-  publish_content
+  publish_content,
+  get_ralation_list,
+  get_ralation_list_by_id
 };

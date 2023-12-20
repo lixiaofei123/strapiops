@@ -62,7 +62,16 @@
                       :disabled="!metadatas[attr.name].edit.editable" v-model="model_value[attr.name]"
                       :config="editorConfig" style="height:300px"></ckeditor>
 
-                    <span>{{ metadatas[attr.name].edit.description }}</span>
+                    <RalationSelect v-if="model_attributes[attr.name].type === 'relation'" 
+                      :attributes="model_attributes[attr.name]" 
+                      :attrbute_name="attr.name"
+                      :metadata="metadatas[attr.name].edit"
+                      :disabled="!metadatas[attr.name].edit.editable" 
+                      :model="model"
+                      v-model="model_value[attr.name]"
+                      :content_id="content_id"
+                      ></RalationSelect>
+                    <span style="display: block;">{{ metadatas[attr.name].edit.description }}</span>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -105,11 +114,13 @@ import Uploader from "../components/Uploader.vue"
 import { beautify_iso_time } from "../../utils/utils"
 import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 import UploadAdapter from '../components/UploadAdapter';
+import RalationSelect from '../components/RalationSelect';
 
 export default {
   name: "Content",
   components: {
-    Uploader
+    Uploader,
+    RalationSelect
   },
   data() {
     return {
@@ -121,7 +132,9 @@ export default {
       model_attributes: {},
       model_layouts: [],
       model_value: {
+       
       },
+      content_id: -1,
       rules: {},
       editor: ClassicEditor,
       editorConfig: {
@@ -213,11 +226,10 @@ export default {
         })
         this.rules = rules
         this.model_value = model_value
-
-
         if (this.itemid) {
           get_content_by_id(this.model, this.itemid, data => {
             this.model_value = data
+            this.content_id = data.id
             this.model_attributes = model_attributes
           })
         } else {
