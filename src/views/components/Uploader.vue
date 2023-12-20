@@ -49,6 +49,7 @@ export default {
         attrbute: Object,
         metadata: Object,
         attrbute_name: String,
+        disabled: Boolean,
         init_images: [Object, Array]
     },
     data() {
@@ -223,7 +224,7 @@ export default {
     },
     computed: {
         canupload() {
-            return !this.uploadding && ((this.uploadList.length > 0 && this.attrbute.multiple) || (this.uploadList.length === 0))
+            return !this.disabled && !this.uploadding && ((this.uploadList.length > 0 && this.attrbute.multiple) || (this.uploadList.length === 0))
         },
     },
 };

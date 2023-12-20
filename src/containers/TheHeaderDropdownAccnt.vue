@@ -11,7 +11,7 @@
       </CHeaderNavLink>
     </template>
     <CDropdownItem @click="logout0">
-      <CIcon name="cil-lock-locked" /> 注销
+      <CIcon name="cil-lock-locked" /> 退出
     </CDropdownItem>
   </CDropdown>
 </template>

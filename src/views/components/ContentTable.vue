@@ -21,7 +21,12 @@
                         </div>
                     </div>
                     <div v-if="item[field.key].type === 'boolean'">
-                        <el-switch v-model="item[field.key].data" active-color="#13ce66" inactive-color="#ff4949" 
+                        <i v-if="!item[field.key].can_update && item[field.key].data"  class="el-icon-success" 
+                            style="color:#67C23A;font-size:25px"></i>
+                        <i v-if="!item[field.key].can_update && !item[field.key].data" class="el-icon-error" 
+                            style="color:#E6A23C;font-size:25px"></i>
+                        <el-switch  v-if="item[field.key].can_update" v-model="item[field.key].data" 
+                            active-color="#13ce66" inactive-color="#ff4949" 
                             @change="event=>bool_value_changed(item, field.key, event)">
                         </el-switch>
                     </div>

@@ -116,8 +116,8 @@ export default {
       return result.url
     },
     get_value(metadata, result) {
-
-      if (result) {
+      
+      if (result !== undefined && result != null) {
         if (typeof result === "string") {
           if (this.isValidDateTimeFormat(result)) {
             let time = Date.parse(result)
@@ -133,6 +133,15 @@ export default {
           }
 
         }
+        if (typeof result === "boolean") {
+          return {
+              type: "boolean",
+              data: result,
+              can_update: false,
+            }
+
+        }
+
         if (result.formats) {
           return {
             type: "image",
@@ -179,6 +188,7 @@ export default {
               }
               item['isPublish'] = {
                 type: "boolean",
+                can_update: true,
                 data: results[i]["publishedAt"] !== null
               }
               items.push(item)

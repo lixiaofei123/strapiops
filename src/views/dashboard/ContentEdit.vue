@@ -17,14 +17,9 @@
           </CCardHeader>
           <CCardBody>
 
-            <el-form ref="form" label-width="80px" :rules="rules" :model="model_value" v-if="model_attributes">
+            <el-form ref="form" label-width="140px" :rules="rules" :model="model_value" v-if="model_attributes">
               <el-row v-for="(layout, index) in model_layouts" v-bind:key="index">
                 <el-col v-for="attr in layout" v-bind:key="attr.name" :span="attr.size * 2">
-                  <!-- <el-input v-if="metadatas[attr.name].edit.visible" 
-                    :label="metadatas[attr.name].edit.label" 
-                    :placeholder="metadatas[attr.name].edit.placeholder" 
-                    :disabled="!metadatas[attr.name].edit.editable" 
-                    :description="metadatas[attr.name].edit.description" /> -->
                   <el-form-item v-if="model_attributes[attr.name] && metadatas[attr.name].edit.visible"
                     :label="metadatas[attr.name].edit.label"
                     :required="model_attributes[attr.name].required ? model_attributes[attr.name].required : false"
@@ -42,26 +37,30 @@
                       v-if="model_attributes[attr.name].type === 'date' || model_attributes[attr.name].type === 'datetime'"
                       v-model="model_value[attr.name]" :type="model_attributes[attr.name].type"
                       :placeholder="metadatas[attr.name].edit.placeholder"
-                      :value-format="model_attributes[attr.name].type === 'date' ? 'yyyy-MM-dd' : 'yyyy-MM-ddTHH:mm:ss.000Z'">
+                      :value-format="model_attributes[attr.name].type === 'date' ? 'yyyy-MM-dd' : 'yyyy-MM-ddTHH:mm:ss.000Z'"
+                      :disabled="!metadatas[attr.name].edit.editable">
                     </el-date-picker>
                     <el-input-number
                       v-if="model_attributes[attr.name].type === 'decimal' || model_attributes[attr.name].type === 'integer'"
                       type="number" v-model="model_value[attr.name]"
                       :precision="model_attributes[attr.name].type === 'decimal' ? 2 : 0"
                       :max="model_attributes[attr.name].max" :min="model_attributes[attr.name].min"
-                      :placeholder="metadatas[attr.name].edit.placeholder">
+                      :placeholder="metadatas[attr.name].edit.placeholder"
+                      :disabled="!metadatas[attr.name].edit.editable">
 
                     </el-input-number>
                     <el-switch v-if="model_attributes[attr.name].type === 'boolean'" v-model="model_value[attr.name]"
-                      active-color="#13ce66" inactive-color="#ff4949">
+                      active-color="#13ce66" inactive-color="#ff4949" :disabled="!metadatas[attr.name].edit.editable">
                     </el-switch>
 
                     <Uploader v-if="model_attributes[attr.name].type === 'media'" :attrbute="model_attributes[attr.name]"
                       :attrbute_name="attr.name" :metadata="metadatas[attr.name].edit" @uploadsuccess="uploadImageSuccess"
-                      :init_images="model_value[attr.name]" @delete="deleteImage"></Uploader>
+                      :init_images="model_value[attr.name]" @delete="deleteImage"
+                      :disabled="!metadatas[attr.name].edit.editable"></Uploader>
 
                     <ckeditor class="ckeditor" v-if="model_attributes[attr.name].type === 'richtext'" :editor="editor"
-                      v-model="model_value[attr.name]" :config="editorConfig" style="height:300px"></ckeditor>
+                      :disabled="!metadatas[attr.name].edit.editable" v-model="model_value[attr.name]"
+                      :config="editorConfig" style="height:300px"></ckeditor>
 
                     <span>{{ metadatas[attr.name].edit.description }}</span>
                   </el-form-item>

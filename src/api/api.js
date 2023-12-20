@@ -108,10 +108,10 @@ function get_content_configuration(model, resolve, reject) {
 function get_content_list(model, sort_by, sort_order, page, pageCount, resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
-  let url = `${config.url}/content-manager/collection-types/${model}?page=${page}&pageSize=${pageCount}&sort=id:DESC`
-  // if (sort_by) {
-  //   url = `${url}&$sort=${sort_by}:${sort_order}`
-  // }
+  let url = `${config.url}/content-manager/collection-types/${model}?page=${page}`
+  if (sort_by) {
+    url = `${url}&$sort=${sort_by}:${sort_order}`
+  }
 
   axios
     .get(url)
