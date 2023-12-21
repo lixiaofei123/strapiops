@@ -61,6 +61,7 @@ export default {
         })
         this.admin_nav[0]["_children"][1].items = models
         this.$store.commit('setContentTypes', data.data.contentTypes)
+        this.$store.commit('setComponents', data.data.components)
       })
     },
   },

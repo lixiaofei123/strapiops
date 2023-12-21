@@ -11,40 +11,40 @@ const state = {
 }
 
 const mutations = {
-  toggleSidebarDesktop (state) {
+  toggleSidebarDesktop(state) {
     const sidebarOpened = [true, 'responsive'].includes(state.sidebarShow)
     state.sidebarShow = sidebarOpened ? false : 'responsive'
   },
-  toggleSidebarMobile (state) {
+  toggleSidebarMobile(state) {
     const sidebarClosed = [false, 'responsive'].includes(state.sidebarShow)
     state.sidebarShow = sidebarClosed ? true : 'responsive'
   },
-  setUserInfo(state,user){
+  setUserInfo(state, user) {
     state.user = user
   },
-  setContentTypes(state,contentTypes){
+  setContentTypes(state, contentTypes) {
     state.contentTypes = contentTypes
 
   },
-  setComponents(state,components){
+  setComponents(state, components) {
     state.components = components
   },
-  set (state, [variable, value]) {
+  set(state, [variable, value]) {
     state[variable] = value
   }
 }
 
 const getters = {
-  getContentTypeByUid: (state) => (uid) => {
+  getModelContentTypeByUid: (state) => (uid) => {
     let findindex = state.contentTypes.findIndex(x => x.uid === uid)
-    if(findindex !== -1){
+    if (findindex !== -1) {
       return state.contentTypes[findindex]
     }
     return undefined
   },
-  getComponentByUid: (state) => (uid) => {
+  getComponentContentTypeByUid: (state) => (uid) => {
     let findindex = state.components.findIndex(x => x.uid === uid)
-    if(findindex !== -1){
+    if (findindex !== -1) {
       return state.components[findindex]
     }
     return undefined

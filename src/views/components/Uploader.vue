@@ -30,7 +30,7 @@
                 </div>
             </div>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="showImageCropDialog = false">取 消</el-button>
+                <el-button @click="cancelCrop()">取 消</el-button>
                 <el-button type="primary" @click="cropFinished">确 定</el-button>
             </span>
 
@@ -202,6 +202,10 @@ export default {
             }
             this.filename = undefined
             this.uploadding = false
+        },
+        cancelCrop(){
+            this.clearUpload()
+            this.showImageCropDialog = false
         },
         cropFinished() {
             if (this.cropper) {

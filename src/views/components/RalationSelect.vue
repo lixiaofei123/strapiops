@@ -4,9 +4,6 @@
             <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
         </el-select>
-        <!-- <el-tag v-for="item in selects" :key="item.id" closable @close="deleteItem(item)">
-            {{ item.label }}
-        </el-tag> -->
         <div v-if="selects.length > 0">
             <div class="sortitem" v-for="item in selects" v-bind:key="item.label"
                 v-dragging="{ item: item, list: selects, group: 'item' }">
@@ -145,8 +142,8 @@ export default {
                                 initSelects.push(this.get_info(results[i]))
                             }
 
-                            this.initSelects = initSelects
-                            this.selects = initSelects
+                            this.initSelects = deepCopy(initSelects)
+                            this.selects = deepCopy(initSelects)
                         }
 
                         if (this.attributes.relation === "manyToOne") {
@@ -154,8 +151,8 @@ export default {
                             let initSelects = [
                                 this.get_info(data1)
                             ]
-                            this.initSelects = initSelects
-                            this.selects = initSelects
+                            this.initSelects = deepCopy(initSelects)
+                            this.selects = deepCopy(initSelects)
 
                         }
 

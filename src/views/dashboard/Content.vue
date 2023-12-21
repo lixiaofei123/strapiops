@@ -91,7 +91,7 @@ export default {
       this.contenttype = undefined
     },
     load_model_info() {
-      let contenttype = this.$store.getters.getContentTypeByUid(this.model)
+      let contenttype = this.$store.getters.getModelContentTypeByUid(this.model)
       if (contenttype) {
         this.model_info = contenttype.info
         this.contenttype = contenttype

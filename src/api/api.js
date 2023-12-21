@@ -110,7 +110,7 @@ function get_content_list(model, sort_by, sort_order, page, pageCount, resolve, 
   reject = reject || function () { };
   let url = `${config.url}/content-manager/collection-types/${model}?page=${page}&pageSize=${pageCount}`
   if (sort_by) {
-    url = `${url}&$sort=${sort_by}:${sort_order}`
+    url = `${url}&sort=${sort_by}:${sort_order}`
   }
 
   axios
