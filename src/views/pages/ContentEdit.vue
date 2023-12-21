@@ -47,7 +47,7 @@
         </CCard>
         <CCard v-if="model_info">
           <CCardBody>
-            <CButton  v-if="itemid && permission.read" @click="gotoList()" style="width:100%" color="primary" class="mb-2">
+            <CButton  v-if="permission.read" @click="gotoList()" style="width:100%" color="primary" class="mb-2">
               返回{{ model_info.displayName }}列表
             </CButton>
             <CButton v-if="itemid && permission.create" @click="gotoNew()" style="width:100%" color="primary" class="mb-2">

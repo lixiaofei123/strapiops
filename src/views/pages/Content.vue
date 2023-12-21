@@ -18,9 +18,7 @@
       </CCardHeader>
       <CCardBody>
         <ContentTable :fields="fields" :items="items" @deleteContent="deleteContent" @editContent="editContent"
-          @bool_value_changed="bool_value_changed"
-          :permission="permission"
-          ></ContentTable>
+          @bool_value_changed="bool_value_changed" :permission="permission"></ContentTable>
         <CPagination align="end" :active-page.sync="currentPage" :pages="page_count" />
         <br>
       </CCardBody>
@@ -186,28 +184,25 @@ export default {
       get_content_list(this.model, this.sort_by,
         this.sort_order, page, this.page_size, data => {
           let results = data.results
-          if (results.length > 0) {
-            let items = []
-            for (let i = 0; i < results.length; i++) {
-              let item = {}
-              for (let j = 0; j < this.fields.length; j++) {
-                let field = this.fields[j].key
-                let value = this.get_value(this.metadatas[field], results[i][field])
-                item[field] = value
+          let items = []
+          for (let i = 0; i < results.length; i++) {
+            let item = {}
+            for (let j = 0; j < this.fields.length; j++) {
+              let field = this.fields[j].key
+              let value = this.get_value(this.metadatas[field], results[i][field])
+              item[field] = value
 
-              }
-
-              item['isPublish'] = {
-                type: "boolean",
-                can_update: this.permission.publish,
-                data: results[i]["publishedAt"] !== null
-              }
-             
-              items.push(item)
             }
-            this.items = items
-          }
 
+            item['isPublish'] = {
+              type: "boolean",
+              can_update: this.permission.publish,
+              data: results[i]["publishedAt"] !== null
+            }
+
+            items.push(item)
+          }
+          this.items = items
           let pagination = data.pagination
           this.currentPage = page
           this.page_count = pagination.pageCount
