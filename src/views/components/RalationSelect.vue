@@ -5,12 +5,15 @@
             </el-option>
         </el-select>
         <div v-if="selects.length > 0">
-            <div class="sortitem" v-for="item in selects" v-bind:key="item.label"
+            <!-- <div class="sortitem" v-for="item in selects" v-bind:key="item.label"
                 v-dragging="{ item: item, list: selects, group: 'item' }">
+                <i class="icon-close el-icon-close" @click="deleteItem(item)"></i>
                 {{ item.label }}
-                <el-button type="danger" icon="el-icon-delete" style="width: 30px;height:30px;" circle size="mini"
-                    @click="deleteItem(item)"></el-button>
-            </div>
+            </div> -->
+            <el-tag v-for="item in selects" :key="item.label" closable type="info" v-dragging="{ item: item, list: selects, group: attrbute_name }" @close="deleteItem(item)">
+                {{ item.label }}
+            </el-tag>
+
         </div>
 
 
@@ -201,7 +204,7 @@ export default {
   
 <style scoped>
 .sortitem {
-    width: 130px;
+    width: 210px;
     height: 50px;
     padding: 10px;
     border: 1px solid #E4E7ED;
@@ -210,8 +213,26 @@ export default {
     margin: 5px;
     border-radius: 4px;
     cursor: pointer;
-    display: flex;
-    justify-content: space-between;
+
+}
+
+.sortitem-text {
+    width: 130px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: inline-block;
+    margin-right: 15px;
+}
+
+.deletebtn {
+    width: 30px;
+    height: 30px;
+    margin-top: -20px;
+}
+
+.icon-close {
+    color: #f56c6c
 }
 
 /deep/ .el-tag {

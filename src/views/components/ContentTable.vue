@@ -35,14 +35,14 @@
                     <div>
                         <CRow class="align-items-center remove-padding">
                             <CCol :col="permission.delete ? 6 : 12">
-                                <CButton  v-if="permission.update" block color="secondary" size="sm" @click="$emit('editContent', item.id.data)">编辑
-                                </CButton>
-                                <CButton  v-else block color="primary" size="sm" @click="$emit('editContent', item.id.data)">查看
-                                </CButton>
+                                <el-button  v-if="permission.update" block type="info"  size="small" @click="$emit('editContent', item.id.data)">编辑
+                                </el-button>
+                                <el-button  v-else block type="primary"  size="small" @click="$emit('editContent', item.id.data)">查看
+                                </el-button>
                             </CCol>
                             <CCol col="6" v-if="permission.delete">
-                                <CButton block color="danger" size="sm" @click="$emit('deleteContent', item.id.data)">删除
-                                </CButton>
+                                <el-button block type="danger"  size="small" @click="$emit('deleteContent', item.id.data)">删除
+                                </el-button>
                             </CCol>
                         </CRow>
                     </div>

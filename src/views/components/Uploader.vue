@@ -237,9 +237,19 @@ export default {
 <style scoped>
 .image-container {
     width: 100%;
-    overflow-x: scroll;
+    overflow-x: auto;
     overflow-y: hidden;
 }
+
+.image-container::-webkit-scrollbar{width:100px;height: 7px}
+.image-container::-webkit-scrollbar-thumb{
+    background: #409EFF;
+    width: 7px;
+    opacity: 0.4;
+    border-radius: 7px;
+    z-index: 99;
+}
+
 
 .previewbox {
     width: 100px;

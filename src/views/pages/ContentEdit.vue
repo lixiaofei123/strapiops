@@ -7,12 +7,12 @@
 
             <CRow>
               <CCol sm="8">
-                <CIcon v-if="model_info" name="cil-justify-center" /><strong> {{ model_info.displayName }}</strong>
+                <CIcon name="cil-justify-center" /><strong v-if="model_info"> {{ model_info.displayName }}</strong>
               </CCol>
-              <CCol sm="4" style="text-align: right;" v-if="permission.create || permission.update">
-                <CButton @click="saveModelData()" color="primary" class="mb-2">
+              <CCol sm="4" style="text-align: right;" v-if="permission && (permission.create || permission.update)">
+                <el-button @click="saveModelData()" type="primary">
                   保存
-                </CButton>
+                </el-button>
               </CCol>
             </CRow>
 
@@ -47,12 +47,13 @@
         </CCard>
         <CCard v-if="model_info">
           <CCardBody>
-            <CButton  v-if="permission.read" @click="gotoList()" style="width:100%" color="primary" class="mb-2">
+            <el-button v-if="permission.read" @click="gotoList()" style="width:100%">
               返回{{ model_info.displayName }}列表
-            </CButton>
-            <CButton v-if="itemid && permission.create" @click="gotoNew()" style="width:100%" color="primary" class="mb-2">
+            </el-button>
+            <div style="height: 20px;"></div>
+            <el-button v-if="itemid && permission.create" @click="gotoNew()" style="width:100%" type="primary">
               新建{{ model_info.displayName }}
-            </CButton>
+            </el-button>
           </CCardBody>
         </CCard>
       </CCol>
@@ -102,6 +103,28 @@ export default {
         if (model) {
           this.model = model
           this.load_model_info()
+        }
+      }
+    },
+    model_info: {
+      immediate: true,
+      handler(newval) {
+        if (newval) {
+          this.$store.commit('setNavs', [
+            {
+              active: true,
+              name: "内容管理"
+            },
+            {
+              to: `#/content?model=${this.model}`,
+              name: newval.displayName + "列表"
+            },
+
+            {
+              active: true,
+              name: "编辑"
+            }
+          ])
         }
       }
     },
@@ -156,10 +179,10 @@ export default {
         callback(data)
       })
     },
-    gotoList(){
+    gotoList() {
       this.$router.push({ path: `/content?model=${this.model}` });
     },
-    gotoNew(){
+    gotoNew() {
       this.$router.push({ path: `/contentEdit?model=${this.model}` });
     },
     beautify_iso_time(iostime) {

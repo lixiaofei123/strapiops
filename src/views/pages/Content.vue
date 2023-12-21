@@ -4,12 +4,12 @@
       <CCardHeader>
         <CRow>
           <CCol sm="8">
-            <CIcon name="cil-justify-center" /><strong> {{ model_info.displayName }}</strong>
+            <CIcon v-if="model_info" name="cil-justify-center" /><strong> {{ model_info.displayName }}</strong>
           </CCol>
-          <CCol sm="4" style="text-align: right;" v-if="permission.create">
-            <CButton v-if="model_info" size="sm" color="primary" @click="editContent('')">
+          <CCol sm="4" style="text-align: right;" v-if="permission && permission.create">
+            <el-button v-if="model_info" type="primary" @click="editContent('')">
               新增{{ model_info.displayName }}
-            </CButton>
+            </el-button>
           </CCol>
         </CRow>
 
@@ -19,7 +19,11 @@
       <CCardBody>
         <ContentTable :fields="fields" :items="items" @deleteContent="deleteContent" @editContent="editContent"
           @bool_value_changed="bool_value_changed" :permission="permission"></ContentTable>
-        <CPagination align="end" :active-page.sync="currentPage" :pages="page_count" />
+        <el-pagination background layout="prev, pager, next" :total="totalCount" :page-size="pageSize"
+          @current-change="page => currentPage = page">
+        </el-pagination>
+
+
         <br>
       </CCardBody>
 
@@ -44,8 +48,8 @@ export default {
       fields: [],
       items: [],
       currentPage: 1,
-      page_count: 1,
-      page_size: 10,
+      totalCount: 1,
+      pageSize: 10,
       sort_by: undefined,
       sort_order: undefined,
       metadatas: undefined,
@@ -56,7 +60,7 @@ export default {
     };
   },
   created() {
-
+    
   },
   computed: {
 
@@ -75,15 +79,33 @@ export default {
     },
     currentPage(newval) {
       this.load_content_list(newval);
-    }
+    },
+    model_info: {
+      immediate: true,
+      handler(newval) {
+        if (newval) {
+          this.$store.commit('setNavs', [
+            {
+              active: true,
+              name: "内容管理"
+            },
+            {
+              active: true,
+              name: newval.displayName + "列表"
+            }
+          ])
+        }
+
+      }
+    },
   },
   methods: {
     clear() {
       this.fields = []
       this.items = []
       this.currentPage = 1
-      this.page_count = 1
-      this.page_size = 10
+      this.totalCount = 1
+      this.pageSize = 10
       this.sort_by = undefined
       this.sort_order = undefined
       this.metadatas = undefined
@@ -205,8 +227,8 @@ export default {
           this.items = items
           let pagination = data.pagination
           this.currentPage = page
-          this.page_count = pagination.pageCount
-          this.page_size = pagination.pageSize
+          this.totalCount = pagination.total
+          this.pageSize = pagination.pageSize
         }
       )
 

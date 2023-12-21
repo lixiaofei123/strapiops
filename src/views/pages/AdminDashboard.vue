@@ -17,7 +17,12 @@ export default {
     };
   },
   created() {
-    
+    this.$store.commit('setNavs', [
+      {
+        active: true,
+        name: "主面板"
+      }
+    ])
   },
   computed: {
    

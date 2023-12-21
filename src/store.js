@@ -8,7 +8,8 @@ const state = {
   user: {},
   contentTypes: [],
   components: [],
-  permissionsMap: {}
+  permissionsMap: {},
+  navs: []
 }
 
 const mutations = {
@@ -32,6 +33,9 @@ const mutations = {
   },
   setPermissionsMap(state, permissionsMap) {
     state.permissionsMap = permissionsMap
+  },
+  setNavs(state, navs) {
+    state.navs = navs
   },
   set(state, [variable, value]) {
     state[variable] = value
