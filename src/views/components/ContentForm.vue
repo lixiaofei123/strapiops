@@ -275,8 +275,8 @@ export default {
   text-align: center;
 }
 
-/deep/ .ck-content {
-  line-height: 20%;
+/deep/ .ck-content *{
+  line-height: 120%;
 }
 
 /deep/ .ck-editor__editable_inline {
