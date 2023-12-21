@@ -214,6 +214,16 @@ function get_ralation_list_by_id(model, field, entityId, page, pageCount, resolv
     .catch((err) => reject(err));
 }
 
+function get_permissions( resolve, reject){
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/admin/users/me/permissions`
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
 
 export {
   myInfo,
@@ -229,5 +239,6 @@ export {
   update_content_by_id,
   publish_content,
   get_ralation_list,
-  get_ralation_list_by_id
+  get_ralation_list_by_id,
+  get_permissions
 };

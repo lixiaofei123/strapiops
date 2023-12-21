@@ -6,7 +6,7 @@
           <CCol sm="8">
             <CIcon name="cil-justify-center" /><strong> {{ model_info.displayName }}</strong>
           </CCol>
-          <CCol sm="4" style="text-align: right;">
+          <CCol sm="4" style="text-align: right;" v-if="permission.create">
             <CButton v-if="model_info" size="sm" color="primary" @click="editContent('')">
               新增{{ model_info.displayName }}
             </CButton>
@@ -18,7 +18,9 @@
       </CCardHeader>
       <CCardBody>
         <ContentTable :fields="fields" :items="items" @deleteContent="deleteContent" @editContent="editContent"
-          @bool_value_changed="bool_value_changed"></ContentTable>
+          @bool_value_changed="bool_value_changed"
+          :permission="permission"
+          ></ContentTable>
         <CPagination align="end" :active-page.sync="currentPage" :pages="page_count" />
         <br>
       </CCardBody>
@@ -51,7 +53,8 @@ export default {
       metadatas: undefined,
       model: "",
       model_info: {},
-      contenttype: undefined
+      contenttype: undefined,
+      permission: undefined
     };
   },
   created() {
@@ -93,6 +96,13 @@ export default {
     load_model_info() {
       let contenttype = this.$store.getters.getModelContentTypeByUid(this.model)
       if (contenttype) {
+        this.permission = this.$store.getters.getPermissionByUid(this.model)
+        if (!this.permission || !this.permission.read) {
+          this.$alert('您无权访问此页面', '警告', {
+            confirmButtonText: '确定'
+          });
+          return
+        }
         this.model_info = contenttype.info
         this.contenttype = contenttype
         this.content_configuration()
@@ -116,7 +126,7 @@ export default {
       return result.url
     },
     get_value(metadata, result) {
-      
+
       if (result !== undefined && result != null) {
         if (typeof result === "string") {
           if (this.isValidDateTimeFormat(result)) {
@@ -135,10 +145,10 @@ export default {
         }
         if (typeof result === "boolean") {
           return {
-              type: "boolean",
-              data: result,
-              can_update: false,
-            }
+            type: "boolean",
+            data: result,
+            can_update: false,
+          }
 
         }
 
@@ -186,11 +196,13 @@ export default {
                 item[field] = value
 
               }
+
               item['isPublish'] = {
                 type: "boolean",
-                can_update: true,
+                can_update: this.permission.publish,
                 data: results[i]["publishedAt"] !== null
               }
+             
               items.push(item)
             }
             this.items = items

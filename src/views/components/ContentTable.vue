@@ -34,11 +34,13 @@
                 <td>
                     <div>
                         <CRow class="align-items-center remove-padding">
-                            <CCol col="6">
-                                <CButton block color="secondary" size="sm" @click="$emit('editContent', item.id.data)">编辑
+                            <CCol :col="permission.delete ? 6 : 12">
+                                <CButton  v-if="permission.update" block color="secondary" size="sm" @click="$emit('editContent', item.id.data)">编辑
+                                </CButton>
+                                <CButton  v-else block color="primary" size="sm" @click="$emit('editContent', item.id.data)">查看
                                 </CButton>
                             </CCol>
-                            <CCol col="6">
+                            <CCol col="6" v-if="permission.delete">
                                 <CButton block color="danger" size="sm" @click="$emit('deleteContent', item.id.data)">删除
                                 </CButton>
                             </CCol>
@@ -55,7 +57,8 @@ export default {
     name: "ContentTable",
     props: {
         items: Array,
-        fields: Array
+        fields: Array,
+        permission: Object
     },
     data() {
         return {

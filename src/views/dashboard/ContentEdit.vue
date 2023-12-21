@@ -9,7 +9,7 @@
               <CCol sm="8">
                 <CIcon v-if="model_info" name="cil-justify-center" /><strong> {{ model_info.displayName }}</strong>
               </CCol>
-              <CCol sm="4" style="text-align: right;">
+              <CCol sm="4" style="text-align: right;" v-if="permission.create || permission.update">
                 <CButton @click="saveModelData()" color="primary" class="mb-2">
                   保存
                 </CButton>
@@ -47,10 +47,10 @@
         </CCard>
         <CCard v-if="model_info">
           <CCardBody>
-            <CButton @click="gotoList()" style="width:100%" color="primary" class="mb-2">
+            <CButton  v-if="itemid && permission.read" @click="gotoList()" style="width:100%" color="primary" class="mb-2">
               返回{{ model_info.displayName }}列表
             </CButton>
-            <CButton v-if="itemid" @click="gotoNew()" style="width:100%" color="primary" class="mb-2">
+            <CButton v-if="itemid && permission.create" @click="gotoNew()" style="width:100%" color="primary" class="mb-2">
               新建{{ model_info.displayName }}
             </CButton>
           </CCardBody>
@@ -81,7 +81,8 @@ export default {
       model_info: undefined,
       model_configuration: undefined,
       model_attributes: undefined,
-      itemid: undefined
+      itemid: undefined,
+      permission: undefined
     };
   },
   created() {
@@ -117,6 +118,14 @@ export default {
     load_model_info() {
       let contenttype = this.$store.getters.getModelContentTypeByUid(this.model)
       if (contenttype) {
+        this.permission = this.$store.getters.getPermissionByUid(this.model)
+        if (!this.permission || !this.permission.read) {
+          this.$alert('您无权访问此页面', '警告', {
+            confirmButtonText: '确定'
+          });
+          return
+        }
+
         this.model_info = contenttype.info
         this.model_attributes = contenttype.attributes
         // 获取布局和元信息

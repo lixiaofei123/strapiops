@@ -7,7 +7,8 @@ const state = {
   sidebarMinimize: false,
   user: {},
   contentTypes: [],
-  components: []
+  components: [],
+  permissionsMap: {}
 }
 
 const mutations = {
@@ -29,9 +30,12 @@ const mutations = {
   setComponents(state, components) {
     state.components = components
   },
+  setPermissionsMap(state, permissionsMap) {
+    state.permissionsMap = permissionsMap
+  },
   set(state, [variable, value]) {
     state[variable] = value
-  }
+  },
 }
 
 const getters = {
@@ -48,7 +52,10 @@ const getters = {
       return state.components[findindex]
     }
     return undefined
-  }
+  },
+  getPermissionByUid: (state) => (uid) => {
+    return state.permissionsMap[uid]
+  },
 }
 
 export default new Vuex.Store({
