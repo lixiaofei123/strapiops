@@ -10,7 +10,7 @@
                     <h1>登录</h1>
                     <p class="text-muted">使用邮箱登录</p>
                     <CInput
-                      placeholder="email"
+                      placeholder="请输入邮箱账号"
                       autocomplete="username email"
                       v-model="username"
                     >
@@ -19,7 +19,7 @@
                       /></template>
                     </CInput>
                     <CInput
-                      placeholder="Password"
+                      placeholder="请输入密码"
                       type="password"
                       autocomplete="curent-password"
                       v-model="password"

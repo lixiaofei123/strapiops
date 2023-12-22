@@ -128,13 +128,13 @@ function delete_content_by_id(model, id, resolve, reject) {
     .catch((err) => reject(err));
 }
 
-function upload(filename, file, progress, resolve, reject) {
+function upload(folder, filename, file, progress, resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
   progress = progress || function () { }
 
   let formData = new FormData();
-  formData.append("fileInfo", JSON.stringify({ name: filename, folder: null }))
+  formData.append("fileInfo", JSON.stringify({ name: filename, folder: folder }))
   formData.append("files", file)
 
   axios
@@ -214,10 +214,103 @@ function get_ralation_list_by_id(model, field, entityId, page, pageCount, resolv
     .catch((err) => reject(err));
 }
 
-function get_permissions( resolve, reject){
+function get_permissions(resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
   let url = `${config.url}/admin/users/me/permissions`
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+function search_folders(parentid, serch_word, page, pageCount, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/upload/folders?sort=createdAt:DESC&page=${page}&pageSize=${pageCount}&pagination[pageSize]=-1`
+  if (parentid === undefined) {
+    url += "&filters[$and][0][parent][id][$null]=true"
+  } else {
+    url += `&filters[$and][0][parent][id]=${parentid}`
+  }
+
+  if (serch_word) {
+    url += `&_q=${serch_word}`
+  }
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+function create_folder(parentid, name, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+
+  axios
+    .post(`${config.url}/upload/folders/`, {
+      name: name,
+      parent: parentid
+    })
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+function list_files_with_related(parentpath, page, pageCount, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/upload/files?sort=createdAt:DESC&page=${page}&pageSize=${pageCount}&filters[$and][0][folderPath][$eq]=${parentpath}&populate[related][fields][0]=id&&populate[folder][fields][0]=id&fields[0]=name&fields[1]=url&fields[2]=formats&fields[3]=mime&fields[4]=folderPath`
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+function list_folders(parentid, page, pageCount, resolve, reject) {
+  search_folders(parentid, undefined, page, pageCount, resolve, reject)
+}
+
+
+function list_files(parentpath, page, pageCount, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/upload/files?sort=createdAt:DESC&page=${page}&pageSize=${pageCount}&filters[$and][0][folderPath][$eq]=${parentpath}`
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+function get_folder_by_id(folderid, resolve, reject){
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/upload/folders/${folderid}`
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+function delete_by_id(fileid, resolve, reject){
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/upload/files/${fileid}`
+
+  axios
+    .delete(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
+function folder_structure(resolve, reject){
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${config.url}/upload/folder-structure`
 
   axios
     .get(url)
@@ -240,5 +333,13 @@ export {
   publish_content,
   get_ralation_list,
   get_ralation_list_by_id,
-  get_permissions
+  get_permissions,
+  search_folders,
+  list_folders,
+  create_folder,
+  list_files_with_related,
+  list_files,
+  get_folder_by_id,
+  delete_by_id,
+  folder_structure
 };

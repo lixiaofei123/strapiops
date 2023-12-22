@@ -83,7 +83,7 @@ export default {
       model_configuration: undefined,
       model_attributes: undefined,
       itemid: undefined,
-      permission: undefined
+      permission: undefined,
     };
   },
   created() {

@@ -8,8 +8,9 @@ const state = {
   user: {},
   contentTypes: [],
   components: [],
-  permissionsMap: {},
-  navs: []
+  permissionsMap: undefined,
+  navs: [],
+  uploadFoler: {}
 }
 
 const mutations = {
@@ -37,6 +38,9 @@ const mutations = {
   setNavs(state, navs) {
     state.navs = navs
   },
+  setUploadFoler(state, uploadFoler) {
+    state.uploadFoler = uploadFoler
+  },
   set(state, [variable, value]) {
     state[variable] = value
   },
@@ -59,6 +63,15 @@ const getters = {
   },
   getPermissionByUid: (state) => (uid) => {
     return state.permissionsMap[uid]
+  },
+  getPermissions: (state) => () => {
+    return state.permissionsMap
+  },
+  getModelFolder: (state) => () => {
+    return state.uploadFoler.model
+  },
+  getEditorFolder: (state) => () => {
+    return state.uploadFoler.editor
   },
 }
 

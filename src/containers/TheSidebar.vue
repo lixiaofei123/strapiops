@@ -17,12 +17,12 @@
 
 <script>
 
-import { get_content_init, get_permissions } from "../api/api";
+import { get_content_init } from "../api/api";
 
 export default {
   name: "TheSidebar",
   props: {
-
+    permissions: Object,
   },
   data() {
     return {
@@ -43,71 +43,46 @@ export default {
               items: [
 
               ],
-            },
+            }
           ],
         },
       ]
     };
   },
+  created() {
+    this.load_content_models()
+  },
   methods: {
     load_content_models() {
-      get_permissions(data => {
-        let permissions_map = {}
-        let permissions = data.data
-        for (let i = 0; i < permissions.length; i++) {
-          let permission = permissions[i]
-          let model = permission.subject
-          if (permissions_map[model] === undefined) {
-            permissions_map[model] = {
-              read: false,
-              delete: false,
-              update: false,
-              create: false,
-              publish: false
+      let permissions = this.permissions
+      get_content_init(data => {
+        let content_types = data.data.contentTypes
+        let models = content_types.filter(item => {
+          return (permissions[item.uid] && permissions[item.uid].read) && item.isDisplayed
+        }).map(item => {
+          return {
+            name: item.info.displayName,
+            to: `/content?model=${item.uid}`,
+          }
+        })
+        this.admin_nav[0]["_children"][1].items = models
+        if (permissions["upload"] && permissions["upload"].read) {
+          this.admin_nav[0]["_children"].push(
+            {
+              _name: "CSidebarNavItem",
+              name: "媒体库",
+              to: "/mediaLibrary",
+              icon: "cil-image"
             }
-          }
-          if (permission.action === "plugin::content-manager.explorer.read") {
-            permissions_map[model].read = true
-          }
-          if (permission.action === "plugin::content-manager.explorer.delete") {
-            permissions_map[model].delete = true
-          }
-          if (permission.action === "plugin::content-manager.explorer.update") {
-            permissions_map[model].update = true
-          }
-          if (permission.action === "plugin::content-manager.explorer.create") {
-            permissions_map[model].create = true
-          }
-          if (permission.action === "plugin::content-manager.explorer.publish") {
-            permissions_map[model].publish = true
-          }
+          )
         }
 
-        this.$store.commit('setPermissionsMap', permissions_map)
-
-        get_content_init(data => {
-          let content_types = data.data.contentTypes
-          let models = content_types.filter(item => {
-            return (permissions_map[item.uid] && permissions_map[item.uid].read) && item.isDisplayed
-          }).map(item => {
-            return {
-              name: item.info.displayName,
-              to: `/content?model=${item.uid}`,
-            }
-          })
-          this.admin_nav[0]["_children"][1].items = models
-          this.$store.commit('setContentTypes', data.data.contentTypes)
-          this.$store.commit('setComponents', data.data.components)
-        })
-
-      });
-
+        this.$store.commit('setContentTypes', data.data.contentTypes)
+        this.$store.commit('setComponents', data.data.components)
+      })
     },
   },
   watch: {
-    user() {
-      this.load_content_models()
-    },
   },
   computed: {
     show() {
@@ -115,9 +90,6 @@ export default {
     },
     minimize() {
       return this.$store.state.sidebarMinimize;
-    },
-    user: function () {
-      return this.$store.state.user;
     }
   },
 };

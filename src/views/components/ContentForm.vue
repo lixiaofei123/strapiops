@@ -46,9 +46,9 @@
               :init_images="model_value[attr.name]" @delete="deleteImage" :disabled="!metadatas[attr.name].edit.editable">
             </Uploader>
 
-            <ckeditor class="ckeditor" v-if="model_attributes[attr.name].type === 'richtext'" :editor="editor"
-              :disabled="!metadatas[attr.name].edit.editable" v-model="model_value[attr.name]" :config="editorConfig"
-              style="height:300px"></ckeditor>
+            <ckeditor class="ckeditor" v-if="model_attributes[attr.name].type === 'richtext' && editorConfig"
+              :editor="editor" :disabled="!metadatas[attr.name].edit.editable" v-model="model_value[attr.name]"
+              :config="editorConfig" style="height:300px"></ckeditor>
 
             <RalationSelect v-if="model_attributes[attr.name].type === 'relation'"
               :attributes="model_attributes[attr.name]" :attrbute_name="attr.name" :metadata="metadatas[attr.name].edit"
@@ -104,13 +104,11 @@ export default {
       editor: ClassicEditor,
       metadatas: undefined,
       model_layouts: undefined,
-      editorConfig: {
-        toolbar: ['bold', 'italic', '|', 'link', 'uploadImage'],
-        extraPlugins: [this.uploader]
-      }
+      editorConfig: undefined
     };
   },
   created() {
+    this.init_editor()
     this.init_model_layout()
   },
   computed: {
@@ -122,6 +120,21 @@ export default {
 
   },
   methods: {
+    init_editor() {
+      let folder = this.$store.getters.getEditorFolder()
+      if (folder) {
+        this.editorConfig = {
+          toolbar: ['bold', 'italic', '|', 'link', 'uploadImage'],
+          extraPlugins: [this.uploader],
+          folderid: folder,
+        }
+      }else{
+        setTimeout(()=>{
+          this.init_editor()
+        },100)
+      }
+
+    },
     init_model_layout() {
       let model_attributes = this.model_attributes
       let model_value = {}
@@ -257,8 +270,9 @@ export default {
       });
     },
     uploader(editor) {
+      let folderid = editor.config._config.folderid
       editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-        return new UploadAdapter(loader);
+        return new UploadAdapter(loader,folderid);
       };
     }
   },
@@ -275,7 +289,7 @@ export default {
   text-align: center;
 }
 
-/deep/ .ck-content *{
+/deep/ .ck-content * {
   line-height: 120%;
 }
 

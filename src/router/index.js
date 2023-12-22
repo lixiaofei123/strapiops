@@ -3,6 +3,7 @@ import Router from "vue-router";
 
 const TheContainer = () => import("@/containers/TheContainer");
 const AdminDashboard = () => import("@/views/pages/AdminDashboard");
+const MediaLibrary = () => import("@/views/pages/MediaLibrary");
 const Content = () => import("@/views/pages/Content");
 const ContentEdit = () => import("@/views/pages/ContentEdit");
 const Login = () => import("@/views/pages/Login");
@@ -41,6 +42,10 @@ function configRoutes() {
           path: "contentEdit",
           name: "内容编辑",
           component: ContentEdit
+        },{
+          path: "mediaLibrary",
+          name: "媒体库",
+          component: MediaLibrary
         },
       ],
     },

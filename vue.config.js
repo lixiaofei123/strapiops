@@ -1,7 +1,7 @@
 module.exports = {
   lintOnSave: false,
   runtimeCompiler: true,
-  indexPath: "admin.html",
+  indexPath: "index.html",
   productionSourceMap: process.env.NODE_ENV != 'production',
   configureWebpack: {
     //Necessary to run npm link https://webpack.js.org/configuration/resolve/#resolve-symlinks
