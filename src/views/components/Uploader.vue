@@ -10,7 +10,8 @@
                 </div>
 
                 <div class="previewbox" v-for="item in reverseUploadList" v-bind:key="item.key">
-                    <el-image class="preview_image" :src="item.previewurl" fit="scale-down"></el-image>
+                    <el-image class="preview_image" :src="item.previewurl" fit="scale-down"
+                        :preview-src-list="[item.url]"></el-image>
                     <el-progress class="upload_progress" :percentage="item.uploadprogress" :show-text="false"
                         v-if="item.uploadprogress !== 101"></el-progress>
                     <el-button class="delete_img_btn" type="danger" icon="el-icon-delete" circle
@@ -22,7 +23,7 @@
         <div v-else>
             目前仅支持纯图片上传，不支持混合类型
         </div>
-        <el-dialog title="图片剪裁" :visible.sync="showImageCropDialog" :close-on-click-modal="false"  :show-close="false">
+        <el-dialog title="图片剪裁" :visible.sync="showImageCropDialog" :close-on-click-modal="false" :show-close="false">
             <div style="text-align: center;">
                 <span>此图片要求尺寸比例为{{ width }}x{{ height }}</span>
                 <div>
@@ -148,6 +149,7 @@ export default {
                         this.uploadList.push({
                             key: image.id,
                             previewurl: this.getPreviewUrl(image),
+                            url: image.url,
                             uploadprogress: 101,
                             data: image
                         })
@@ -157,6 +159,7 @@ export default {
                     this.uploadList.push({
                         key: image.id,
                         previewurl: this.getPreviewUrl(image),
+                        url: image.url,
                         uploadprogress: 101,
                         data: image
                     })
@@ -193,6 +196,7 @@ export default {
                 this.clearUpload()
                 uploaditem.uploadprogress = 101
                 uploaditem.data = data[0]
+                uploaditem.url = data[0].url
                 this.$set(this.uploadList, index, uploaditem)
                 this.$emit('uploadsuccess', this.attrbute_name, data[0])
             })
@@ -206,7 +210,7 @@ export default {
             this.filename = undefined
             this.uploadding = false
         },
-        cancelCrop(){
+        cancelCrop() {
             this.clearUpload()
             this.showImageCropDialog = false
         },
@@ -233,7 +237,7 @@ export default {
         canupload() {
             return !this.disabled && !this.uploadding && ((this.uploadList.length > 0 && this.attrbute.multiple) || (this.uploadList.length === 0))
         },
-        reverseUploadList(){
+        reverseUploadList() {
             return this.uploadList.slice().reverse();
         }
     },
@@ -247,8 +251,12 @@ export default {
     overflow-y: hidden;
 }
 
-.image-container::-webkit-scrollbar{width:100px;height: 7px}
-.image-container::-webkit-scrollbar-thumb{
+.image-container::-webkit-scrollbar {
+    width: 100px;
+    height: 7px
+}
+
+.image-container::-webkit-scrollbar-thumb {
     background: #409EFF;
     width: 7px;
     opacity: 0.4;
@@ -310,5 +318,4 @@ export default {
 .src_image {
     width: 100%;
     max-width: 800px;
-}
-</style>
+}</style>

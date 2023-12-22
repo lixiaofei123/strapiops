@@ -36,7 +36,7 @@
       </CCardHeader>
       <CCardBody>
 
-        <div class="files">
+        <div class="files" v-loading="loaddingFolder">
           <div class="dir item" v-for="folder in curFolders" v-bind:key="folder.id" @click="goToFolder(folder)">
             <img width="92" height="72"
               src="https://img.alicdn.com/imgextra/i1/O1CN01rGJZac1Zn37NL70IT_!!6000000003238-2-tps-230-180.png">
@@ -59,15 +59,20 @@
       </CCardHeader>
       <CCardBody>
 
-        <div class="files">
-          <div class="file item"></div>
-          <div class="file item"></div>
-          <div class="file item"></div>
-          <div class="file item"></div>
-          <div class="file item"></div>
-          <div class="file item"></div>
-          <div class="file item"></div>
+        <div class="files" v-loading="loaddingFiles">
+          <div class="file item" v-for="file in files" v-bind:key="file.id">
+            <el-image style="width: 92px; height: 72px" :src="getIcon(file)" :preview-src-list="[file.url]">
+            </el-image>
+
+            <div class="itemname">
+              {{ file.name }}
+            </div>
+          </div>
         </div>
+        <div style="height: 50px;"></div>
+        <el-pagination background layout="prev, pager, next" :total="file_total" :page-size="file_pagesize"
+          :current-page.sync="file_page">
+        </el-pagination>
 
       </CCardBody>
     </CCard>
@@ -79,7 +84,7 @@
           <p>功能说明: 通过扫描本目录下的文件(不支持递归搜索)，找出其中未被使用的文件。然后可以手动批量删除这些文件来释放服务器上这些图片所占用的空间</p>
           <el-alert title="重要提醒" type="error"
             description="对于富文本字段引用的图片，无法分析依赖关系，会被误删。
-                                                                                        通过本平台编辑富文本上传的图片会被放到strapiadmin/editor目录下，这个目录将会被禁止使用此功能。"
+                                                                                                  通过本平台编辑富文本上传的图片会被放到strapiadmin/editor目录下，这个目录将会被禁止使用此功能。"
             show-icon>
           </el-alert>
         </div>
@@ -102,8 +107,7 @@
           <el-table-column property="mime" label="文件类型" width="100"></el-table-column>
           <el-table-column label="预览" width="120">
             <template slot-scope="scope">
-              <img v-if="scope.row.mime.startsWith('image')" style="width:80px;height: 80px;"
-                :src="getSmallestUrl(scope.row)">
+              <el-image v-if="scope.row.mime.startsWith('image')" style="width:80px;height: 80px;" :src="getIcon(scope.row)"  :preview-src-list="[scope.row.url]"/>
             </template>
           </el-table-column>
 
@@ -149,11 +153,14 @@ export default {
       scanmode: 'scan',
       permission: undefined,
       files: [],
+      loaddingFiles: false,
       folders: [],
       curFolders: [],
+      loaddingFolder: false,
       foler_stacks: [],
       file_page: 1,
-      file_pagesize: 10,
+      file_pagesize: 50,
+      file_total: 0,
       foler_page: 1,
       foler_pagesize: 10,
       path: "/",
@@ -174,6 +181,15 @@ export default {
     },
   },
   watch: {
+    path: {
+      immediate: true,
+      handler(newval) {
+        this.loadFilesByPath(newval, 1)
+      }
+    },
+    file_page(newval) {
+      this.loadFilesByPath(this.path, newval)
+    },
   },
   methods: {
     init() {
@@ -199,8 +215,20 @@ export default {
         this.goToFolder()
       })
     },
+    loadFilesByPath(newval, page) {
+      this.file_page = page
+      this.loaddingFiles = true
+      list_files(newval, page, this.file_pagesize, data => {
+        let pagination = data.pagination
+        this.file_total = pagination.total
+        this.files = data.results
+        this.loaddingFiles = false
+      }, () => {
+        this.loaddingFiles = false
+      })
+    },
     goToFolder(folder) {
-
+      this.loaddingFolder = true
       if (folder) {
         for (let i = 0; i < this.foler_stacks.length; i++) {
           if (this.foler_stacks[i].id === folder.id) {
@@ -208,6 +236,7 @@ export default {
             get_folder_by_id(folder.id, data => {
               this.path = data.data.path
               this.curFolders = folder.children
+              this.loaddingFolder = false
             })
             return
           }
@@ -216,12 +245,14 @@ export default {
           this.path = data.data.path
           this.foler_stacks.push(folder)
           this.curFolders = folder.children
+          this.loaddingFolder = false
         })
       } else {
         // 回到跟目录了
         this.path = "/"
         this.curFolders = this.folders
         this.foler_stacks = []
+        this.loaddingFolder = false
       }
 
     },
@@ -259,7 +290,7 @@ export default {
       this.unused_files_selections = []
 
     },
-    getSmallestUrl(item) {
+    getIcon(item) {
       if (item.formats) {
         let formats = item.formats
         return formats["thumbnail"] ? formats["thumbnail"].url : (

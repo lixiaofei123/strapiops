@@ -175,7 +175,8 @@ export default {
         if (result.formats) {
           return {
             type: "image",
-            data: this.get_image_url(result)
+            data: this.get_image_url(result),
+            url: result.url
           }
         }
         if (metadata.list.mainField) {
