@@ -174,7 +174,7 @@ export default {
       return this.unused_files.slice((this.unused_files_page - 1) * this.unused_files_pagesize, this.unused_files_page * this.unused_files_pagesize)
     },
     canScan() {
-      return this.curpath !== "/strapiadmin/editor" && this.permission && this.permission.read && this.permission.update
+      return !this.curpath.startsWith("/strapiadmin/editor") && this.permission && this.permission.read && this.permission.update
     },
     curpath() {
       return this.foler_stacks.reduce((old, item) => old + "/" + item.name, "")
@@ -453,7 +453,6 @@ export default {
   -webkit-box-orient: vertical;
   overflow: hidden;
   -webkit-line-clamp: 2;
-  /* 显示两行 */
   text-overflow: ellipsis;
 }
 

@@ -18,7 +18,8 @@
 </template>
 
 <script>
-import { refresh_token, myInfo, get_permissions, search_folders, create_folder, list_files_with_related } from "../api/api";
+import { refresh_token, myInfo, get_permissions, search_folders, create_folder} from "../api/api";
+import {get_today_string} from "../utils/utils"
 import TheSidebar from "./TheSidebar";
 import TheHeader from "./TheHeader";
 import TheFooter from "./TheFooter";
@@ -39,8 +40,9 @@ export default {
   },
   created() {
     this.loadInfo(() => {
-      this.createUploadFolder(undefined, "strapiadmin/model", model => {
-        this.createUploadFolder(undefined, "strapiadmin/editor", editor => {
+      let today = get_today_string()
+      this.createUploadFolder(undefined, `strapiadmin/model/${today}`, model => {
+        this.createUploadFolder(undefined, `strapiadmin/editor/${today}`, editor => {
           this.$store.commit('setUploadFoler', {
             model: model,
             editor: editor

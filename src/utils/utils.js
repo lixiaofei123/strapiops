@@ -46,6 +46,10 @@ function format_timestamp(timestamp){
     return  moment.unix(timestamp).format("YYYY年MM月DD日 HH时mm分")
 }
 
+function get_today_string(){
+    return moment().format('YYYYMMDD');
+}
+
 function deepCopy(data){
     let str = JSON.stringify(data)
     return JSON.parse(str)
@@ -57,5 +61,6 @@ export {
     wellSize,
     deepCopy,
     beautify_iso_time,
-    format_timestamp
+    format_timestamp,
+    get_today_string
 }

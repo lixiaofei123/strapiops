@@ -1,4 +1,4 @@
-import { upload } from "../../api/api";
+import { upload } from "../../../api/api";
 
 export default class UploadAdapter {
     constructor(loader,folderid) {

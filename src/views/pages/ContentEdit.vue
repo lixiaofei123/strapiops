@@ -221,7 +221,10 @@ export default {
           })
         }
       }, () => {
-        console.log("获取失败.......")
+        this.$notify.error({
+          title: "警告",
+          message: `表单校验失败`,
+        });
       })
 
     },
