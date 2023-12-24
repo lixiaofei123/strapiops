@@ -2,7 +2,7 @@
   <div class="wrapper">
     <el-form ref="form" label-width="140px" :model="model_value" v-if="model_layouts">
       <el-row v-for="(layout, index) in model_layouts" v-bind:key="index">
-        <el-col v-for="attr in layout" v-bind:key="attr.name" :span="attr.size * 2">
+        <el-col v-for="attr in layout" v-bind:key="attr.name" :span="24" :xl="attr.size * 2">
           <!-- <el-form-item v-if="model_attributes[attr.name] && metadatas[attr.name].edit.visible"
             :label="metadatas[attr.name].edit.label"
             :required="model_attributes[attr.name].required ? model_attributes[attr.name].required : false"

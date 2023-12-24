@@ -1,26 +1,27 @@
 <template>
   <div v-if="attribute && metadata">
     <div class="image-container">
-      <div :style="{ width: (uploadList.length + 1) * 120 + 'px' }">
-        <div class="uploadbox" @click="readyUploadFile" :style="{
-          'background-color': !canupload ? '#484848' : '#fbfdff'
-        }">
-          <i class="el-icon-plus"></i>
-          <input type="file" ref="upload_btn" class="sr-only" name="image" :accept="accept">
-        </div>
+      <div class="uploadbox" @click="readyUploadFile" :style="{
+        'background-color': !canupload ? '#484848' : '#fbfdff'
+      }">
+        <i class="el-icon-plus"></i>
+        <input type="file" ref="upload_btn" class="sr-only" name="image" :accept="accept">
+      </div>
 
-        <div class="previewbox" v-for="item in reverseUploadList" v-bind:key="item.key">
+      <div class="previewbox" v-for="item in reverseUploadList" v-bind:key="item.key">
+        <div class="filecover">
           <el-image class="preview_image" :src="item.previewurl" fit="scale-down"
             :preview-src-list="item.type === 'image' ? [item.url] : []"></el-image>
-
-          <div class="filename" v-if="item.type !== 'image'">{{ item.name }}</div>
           <el-progress class="upload_progress" :percentage="item.uploadprogress" :show-text="false"
             v-if="item.uploadprogress !== 101"></el-progress>
           <el-button class="delete_img_btn" type="danger" icon="el-icon-delete" circle v-if="item.uploadprogress === 101"
             size="mini" @click="removeFile(item.key)"> </el-button>
         </div>
-      </div>
 
+
+        <div class="filename">{{ item.name }}</div>
+
+      </div>
     </div>
     <el-dialog title="图片剪裁" :visible.sync="showImageCropDialog" :close-on-click-modal="false" :show-close="false">
       <div style="text-align: center;">
@@ -356,33 +357,21 @@ export default {
 <style scoped>
 .image-container {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-
-.image-container::-webkit-scrollbar {
-  width: 100px;
-  height: 7px
-}
-
-.image-container::-webkit-scrollbar-thumb {
-  background: #409EFF;
-  width: 7px;
-  opacity: 0.4;
-  border-radius: 7px;
-  z-index: 99;
+  display: flex;
+  flex-wrap: wrap;
 }
 
 
 .previewbox {
   width: 100px;
-  height: 100px;
   margin-right: 10px;
+}
+
+.filecover{
+  width: 100px;
+  height: 100px;
   border: 1px dashed #c0ccda;
-  border-radius: 6px;
-  box-sizing: border-box;
   position: relative;
-  display: inline-block;
 }
 
 .preview_image {
@@ -403,12 +392,6 @@ export default {
 }
 
 .filename {
-  position: absolute;
-  left: 0px;
-  right: 0px;
-  bottom: 0px;
-  background: rgba(0, 0, 0, 0.6);
-  color: white;
   line-height: 120%;
   display: -webkit-box;
   -webkit-box-orient: vertical;

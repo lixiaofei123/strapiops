@@ -1,20 +1,19 @@
 <template>
   <div class="wrapper">
-    <CRow>
-      <CCol sm="9">
+    <el-row>
+      <el-col :span="24" :xl="18">
         <CCard>
           <CCardHeader>
-
-            <CRow>
-              <CCol sm="8">
+            <el-row>
+              <el-col :span="16">
                 <CIcon name="cil-justify-center" /><strong v-if="model_info"> {{ model_info.displayName }}</strong>
-              </CCol>
-              <CCol sm="4" style="text-align: right;" v-if="permission && (permission.create || permission.update)">
+              </el-col>
+              <el-col :span="8" style="text-align: right;" v-if="permission && (permission.create || permission.update)">
                 <el-button @click="saveModelData()" type="primary">
                   保存
                 </el-button>
-              </CCol>
-            </CRow>
+              </el-col>
+            </el-row>
 
           </CCardHeader>
           <CCardBody>
@@ -24,8 +23,8 @@
           </CCardBody>
 
         </CCard>
-      </CCol>
-      <CCol sm="3">
+      </el-col>
+      <el-col  :span="24" :xl="6">
         <CCard>
           <CCardBody>
             <el-descriptions title="数据信息" direction="horizontal" :column="1" border v-if="init_model_value">
@@ -56,8 +55,8 @@
             </el-button>
           </CCardBody>
         </CCard>
-      </CCol>
-    </CRow>
+      </el-col>
+    </el-row>
 
 
   </div>
