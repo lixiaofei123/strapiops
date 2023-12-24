@@ -7,6 +7,7 @@ const MediaLibrary = () => import("@/views/pages/MediaLibrary");
 const Content = () => import("@/views/pages/Content");
 const ContentEdit = () => import("@/views/pages/ContentEdit");
 const Login = () => import("@/views/pages/Login");
+const JsonSchemaGenerator = () => import("@/views/pages/JsonSchemaGenerator");
 
 Vue.use(Router);
 
@@ -46,6 +47,10 @@ function configRoutes() {
           path: "mediaLibrary",
           name: "媒体库",
           component: MediaLibrary
+        },{
+          path: "jsonSchemaGenerator",
+          name: "JsonSchema生成",
+          component: JsonSchemaGenerator
         },
       ],
     },

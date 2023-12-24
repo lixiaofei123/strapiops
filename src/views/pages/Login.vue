@@ -69,7 +69,7 @@
   </template>
   
   <script>
-  import { siteInfo, login } from "../../api/api";
+  import {login } from "../../api/api";
   var cookies = require("vue-cookie");
   
   export default {
@@ -82,9 +82,7 @@
       };
     },
     created() {
-      siteInfo((data) => {
-        this.allowRegister = data.data.site.allowRegister;
-      });
+     
     },
     methods: {
       loginFlyingCrow() {

@@ -43,6 +43,17 @@ export default {
               items: [
 
               ],
+            },
+            {
+              _name: "CSidebarNavDropdown",
+              name: "工具",
+              icon: "cil-puzzle",
+              items: [
+                {
+                  name: "JsonSchema生成",
+                  to: `/jsonSchemaGenerator`
+                }
+              ],
             }
           ],
         },

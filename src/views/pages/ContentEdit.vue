@@ -5,7 +5,7 @@
         <el-card class="card">
           <div slot="header">
             <span v-if="model_info">{{ model_info.displayName }}</span>
-            <el-button style="float: right"  type="primary" @click="saveModelData()">保存</el-button>
+            <el-button :disabled="!ready || saving" style="float: right"  type="primary" @click="saveModelData()">保存</el-button>
           </div>
           <div style="min-height: 300px;" v-loading="!ready || saving">
             <ContentForm v-if="ready" ref="form" :model="model" :init_model_value="init_model_value" :main_model="true"

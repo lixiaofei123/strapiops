@@ -304,7 +304,7 @@ export default {
       return {}
     },
     validate() {
-      if (this.attribute.required && this.value === undefined || this.value.length === 0) {
+      if (this.attribute.required && (!this.value|| this.value.length === 0)) {
         return "此项为必填"
       }
       return true

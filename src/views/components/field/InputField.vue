@@ -1,6 +1,6 @@
 <template>
   <el-form-item v-if="attribute && metadata.edit.visible" :label="metadata.edit.label"
-    :required="attribute.required" :error="errText">
+    :required="attribute.required" :error="attribute.type !== 'json' ? errText : ''">
     <StringField v-if="attribute.type === 'string' || attribute.type === 'text'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
     </StringField>
@@ -35,6 +35,9 @@
     <RalationField v-else-if="attribute.type === 'relation'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata" :attrname="attrname" :contentId="contentId" :model="model">
     </RalationField>
+    <JsonField v-else-if="attribute.type === 'json'" ref="input" v-model="data" :attribute="attribute"
+      :metadata="metadata" @descriptionChanged="descriptionChanged">
+    </JsonField>
     <span style="display: block;">{{ description }}</span>
   </el-form-item>
 </template>
@@ -52,6 +55,7 @@ import BooleanField from "./BooleanField"
 import RichTextField from "./RichTextField"
 import MediaField from "./MediaField"
 import RalationField from "./RalationField"
+import JsonField from "./json/JsonField"
 
 export default {
   name: "InputField",
@@ -70,7 +74,8 @@ export default {
     BooleanField,
     RichTextField,
     MediaField,
-    RalationField
+    RalationField,
+    JsonField
   },
   props: {
     value: [String, Object, Array, Number,Boolean],
