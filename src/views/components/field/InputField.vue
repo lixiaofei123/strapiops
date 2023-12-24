@@ -32,6 +32,9 @@
     <MediaField v-else-if="attribute.type === 'media'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
     </MediaField>
+    <RalationField v-else-if="attribute.type === 'relation'" ref="input" v-model="data" :attribute="attribute"
+      :metadata="metadata" :attrname="attrname" :contentId="contentId" :model="model">
+    </RalationField>
     <span style="display: block;">{{ description }}</span>
   </el-form-item>
 </template>
@@ -48,6 +51,7 @@ import TimeField from "./TimeField"
 import BooleanField from "./BooleanField"
 import RichTextField from "./RichTextField"
 import MediaField from "./MediaField"
+import RalationField from "./RalationField"
 
 export default {
   name: "InputField",
@@ -65,12 +69,16 @@ export default {
     TimeField,
     BooleanField,
     RichTextField,
-    MediaField
+    MediaField,
+    RalationField
   },
   props: {
     value: [String, Object, Array, Number,Boolean],
     attribute: Object,
-    metadata: Object
+    metadata: Object,
+    attrname: String,
+    contentId: Number,
+    model: String,
   },
   data() {
     return {
@@ -85,9 +93,6 @@ export default {
     data(newval) {
       this.$emit("change", newval);
     },
-    $refs(){
-      console.log(this.$refs)
-    }
   },
   methods: {
     validate(){

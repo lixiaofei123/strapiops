@@ -42,6 +42,7 @@
 <script>
 import 'cropperjs/dist/cropper.css';
 import { upload } from "../../../api/api";
+import {getThumbnailUrl} from "../../../utils/utils"
 import Cropper from 'cropperjs';
 
 export default {
@@ -132,7 +133,6 @@ export default {
 
         this.$refs.upload_btn.addEventListener('change', e => {
           var files = e.target.files;
-          console.log(files)
           let imageCropHandleFunc = (url, filename) => {
 
             if (this.limitsize) {
@@ -176,7 +176,7 @@ export default {
                 // 其余类型，直接上传
                 this.$refs.upload_btn.value = ""
                 let filename = file.name
-                this.uploadData(this.getPreviewUrl(this.getFileType(file)), filename, file)
+                this.uploadData(getThumbnailUrl(file), filename, file)
 
               }
             } else {
@@ -190,31 +190,6 @@ export default {
 
         })
       }, 100)
-    },
-    getPreviewUrl(type, file) {
-      if (type === "image") {
-        if (file.formats) {
-          if (file.formats.thumbnail) {
-            return file.formats.thumbnail.url
-          }
-          if (file.formats.small) {
-            return file.formats.small.url
-          }
-          if (file.formats.medium) {
-            return file.formats.medium.url
-          }
-        }
-        return file.url
-      } else if (type === "video") {
-        return "https://img.alicdn.com/imgextra/i2/O1CN01YgPBAp1zvunG71HdD_!!6000000006777-2-tps-140-140.png"
-      } else if (type === "audio") {
-        return "https://img.alicdn.com/imgextra/i2/O1CN01YgPBAp1zvunG71HdD_!!6000000006777-2-tps-140-140.png"
-      } else if (type === "other") {
-        return "https://img.alicdn.com/imgextra/i2/O1CN01YgPBAp1zvunG71HdD_!!6000000006777-2-tps-140-140.png"
-      } else if (type === "doc") {
-        return "https://img.alicdn.com/imgextra/i2/O1CN017vpxdQ27S9zPCPqMD_!!6000000007795-2-tps-140-140.png"
-      }
-
     },
     initExistedFiles() {
       if (this.value) {
@@ -323,7 +298,7 @@ export default {
           data: file,
           name: file.name
         }
-        previewItem.previewurl = this.getPreviewUrl(previewItem.type, file)
+        previewItem.previewurl = getThumbnailUrl(file)
         return previewItem
       }
       return {}

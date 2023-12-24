@@ -1,60 +1,48 @@
 <template>
   <div class="wrapper">
     <el-row>
-      <el-col :span="24" :xl="18">
-        <CCard>
-          <CCardHeader>
-            <el-row>
-              <el-col :span="16">
-                <CIcon name="cil-justify-center" /><strong v-if="model_info"> {{ model_info.displayName }}</strong>
-              </el-col>
-              <el-col :span="8" style="text-align: right;" v-if="permission && (permission.create || permission.update)">
-                <el-button @click="saveModelData()" type="primary">
-                  保存
-                </el-button>
-              </el-col>
-            </el-row>
-
-          </CCardHeader>
-          <CCardBody>
+      <el-col :span="24" :xl="18" style="padding-right: 20px;">
+        <el-card class="card">
+          <div slot="header">
+            <span v-if="model_info">{{ model_info.displayName }}</span>
+            <el-button style="float: right"  type="primary" @click="saveModelData()">保存</el-button>
+          </div>
+          <div style="min-height: 300px;" v-loading="!ready || saving">
             <ContentForm v-if="ready" ref="form" :model="model" :init_model_value="init_model_value" :main_model="true"
-              :model_attributes="model_attributes" :model_configuration="model_configuration">
-            </ContentForm>
-          </CCardBody>
-
-        </CCard>
+            :model_attributes="model_attributes" :model_configuration="model_configuration">
+          </ContentForm>
+          </div>
+         
+        </el-card>
       </el-col>
-      <el-col  :span="24" :xl="6">
-        <CCard>
-          <CCardBody>
-            <el-descriptions title="数据信息" direction="horizontal" :column="1" border v-if="init_model_value">
-              <el-descriptions-item label="创建者" v-if="init_model_value.createdBy">{{ init_model_value.createdBy.firstname
-              }}
-                {{ init_model_value.createdBy.lastname }}</el-descriptions-item>
-              <el-descriptions-item label="创建时间" v-if="init_model_value.createdAt">{{
-                beautify_iso_time(init_model_value.createdAt)
-              }}</el-descriptions-item>
-              <el-descriptions-item label="上次更新者" v-if="init_model_value.updatedBy">{{
-                init_model_value.updatedBy.firstname }}
-                {{ init_model_value.updatedBy.lastname }}</el-descriptions-item>
-              <el-descriptions-item label="上次更新时间" v-if="init_model_value.updatedAt">{{
-                beautify_iso_time(init_model_value.updatedAt) }}</el-descriptions-item>
-              <el-descriptions-item label="发布时间" v-if="init_model_value.publishedAt">{{
-                beautify_iso_time(init_model_value.publishedAt) }}</el-descriptions-item>
-            </el-descriptions>
-          </CCardBody>
-        </CCard>
-        <CCard v-if="model_info">
-          <CCardBody>
-            <el-button v-if="permission.read" @click="gotoList()" style="width:100%">
-              返回{{ model_info.displayName }}列表
-            </el-button>
-            <div style="height: 20px;"></div>
-            <el-button v-if="itemid && permission.create" @click="gotoNew()" style="width:100%" type="primary">
-              新建{{ model_info.displayName }}
-            </el-button>
-          </CCardBody>
-        </CCard>
+      <el-col :span="24" :xl="5">
+        <el-card  v-if="init_model_value">
+          <el-descriptions title="数据信息" direction="horizontal" :column="1" border>
+            <el-descriptions-item label="创建者" v-if="init_model_value.createdBy">{{ init_model_value.createdBy.firstname
+            }}
+              {{ init_model_value.createdBy.lastname }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间" v-if="init_model_value.createdAt">{{
+              beautify_iso_time(init_model_value.createdAt)
+            }}</el-descriptions-item>
+            <el-descriptions-item label="上次更新者" v-if="init_model_value.updatedBy">{{
+              init_model_value.updatedBy.firstname }}
+              {{ init_model_value.updatedBy.lastname }}</el-descriptions-item>
+            <el-descriptions-item label="上次更新时间" v-if="init_model_value.updatedAt">{{
+              beautify_iso_time(init_model_value.updatedAt) }}</el-descriptions-item>
+            <el-descriptions-item label="发布时间" v-if="init_model_value.publishedAt">{{
+              beautify_iso_time(init_model_value.publishedAt) }}</el-descriptions-item>
+          </el-descriptions>
+        </el-card>
+        <div style="height: 20px;"></div>
+        <el-card v-if="model_info">
+          <el-button v-if="permission.read" @click="gotoList()" style="width:100%">
+            返回{{ model_info.displayName }}列表
+          </el-button>
+          <div style="height: 20px;"></div>
+          <el-button v-if="itemid && permission.create" @click="gotoNew()" style="width:100%" type="primary">
+            新建{{ model_info.displayName }}
+          </el-button>
+        </el-card>
       </el-col>
     </el-row>
 
@@ -78,6 +66,7 @@ export default {
       model: undefined,
       init_model_value: undefined,
       ready: false,
+      saving: false,
       model_info: undefined,
       model_configuration: undefined,
       model_attributes: undefined,
@@ -187,16 +176,28 @@ export default {
     beautify_iso_time(iostime) {
       return beautify_iso_time(iostime)
     },
-    saveModelData() {
+    saveModelData(){
+      this.saving = true
+      this.saveModelData0(()=>{
+        this.saving = false
+      },()=>{
+        this.saving = false
+      })
+    },
+    saveModelData0(resolve,reject) {
+      resolve = resolve || function(){}
+      reject = reject || function(){}
       this.$refs['form'].getModelData(data => {
         if (this.itemid) {
           update_content_by_id(this.model, this.itemid, data, () => {
+            resolve()
             this.$notify({
               title: '成功',
               message: `数据更新成功`,
               type: 'success'
             });
           }, () => {
+            reject()
             this.$notify.error({
               title: "警告",
               message: `数据保存失败`,
@@ -204,6 +205,7 @@ export default {
           })
         } else {
           save_model_data(this.model, data, data => {
+            resolve()
             this.$notify({
               title: '成功',
               message: `数据保存成功`,
@@ -213,6 +215,7 @@ export default {
             // console.log(data)
             this.$router.push({ path: `/contentEdit?model=${this.model}&itemid=${data.id}` });
           }, () => {
+            reject()
             this.$notify.error({
               title: "警告",
               message: `数据保存失败`,
@@ -220,6 +223,7 @@ export default {
           })
         }
       }, () => {
+        reject()
         this.$notify.error({
           title: "警告",
           message: `表单校验失败`,

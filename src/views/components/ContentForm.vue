@@ -1,6 +1,6 @@
 <template>
   <div class="wrapper">
-    <el-form ref="form" label-width="140px" :model="model_value" v-if="model_layouts">
+    <el-form ref="form" label-width="140px" v-if="model_layouts">
       <el-row v-for="(layout, index) in model_layouts" v-bind:key="index">
         <el-col v-for="attr in layout" v-bind:key="attr.name" :span="24" :xl="attr.size * 2">
           <!-- <el-form-item v-if="model_attributes[attr.name] && metadatas[attr.name].edit.visible"
@@ -9,7 +9,9 @@
             :prop="attr.name"> -->
 
           <InputField v-if="model_attributes[attr.name].type !== 'component'" :ref="attr.name"
-            :attribute="model_attributes[attr.name]" :metadata="metadatas[attr.name]" v-model="model_value[attr.name]">
+            :attribute="model_attributes[attr.name]" :metadata="metadatas[attr.name]" v-model="model_value[attr.name]"
+            :attrname="attr.name" :model="model"  :contentId="content_id"
+            >
           </InputField>
 
 
@@ -27,7 +29,6 @@
 <script>
 
 
-import RalationSelect from '../components/RalationSelect';
 import ContentForm from "./ContentForm.vue"
 import InputField from "./field/InputField.vue"
 import { deepCopy } from "../../utils/utils";
@@ -35,7 +36,6 @@ import { deepCopy } from "../../utils/utils";
 export default {
   name: "ContentForm",
   components: {
-    RalationSelect,
     ContentForm,
     InputField
   },

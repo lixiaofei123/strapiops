@@ -1,16 +1,13 @@
 <template>
     <div>
-        <el-select v-model="value" :placeholder="'请选择' + ralation_name" @change="selectItem">
+        <el-select v-model="value" :placeholder="'请选择' + ralation_name" @change="selectItem"
+            :disabled="!metadata.edit.editable">
             <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
             </el-option>
         </el-select>
         <div v-if="selects.length > 0">
-            <!-- <div class="sortitem" v-for="item in selects" v-bind:key="item.label"
-                v-dragging="{ item: item, list: selects, group: 'item' }">
-                <i class="icon-close el-icon-close" @click="deleteItem(item)"></i>
-                {{ item.label }}
-            </div> -->
-            <el-tag v-for="item in selects" :key="item.label" closable type="info" v-dragging="{ item: item, list: selects, group: attrbute_name }" @close="deleteItem(item)">
+            <el-tag v-for="item in selects" :key="item.label" closable type="info"
+                v-dragging="{ item: item, list: selects, group: attrname }" @close="deleteItem(item)">
                 {{ item.label }}
             </el-tag>
 
@@ -21,24 +18,20 @@
 </template>
   
 <script>
-import { deepCopy } from "../../utils/utils"
-import { get_ralation_list, get_ralation_list_by_id } from "../../api/api";
+import { deepCopy } from "../../../utils/utils"
+import { get_ralation_list, get_ralation_list_by_id } from "../../../api/api";
 
 export default {
-    name: "RalationSelect",
+    name: "RalationField",
     model: {
-        peop: "steps",
         event: 'change'
     },
     props: {
-        attributes: Object,
+        attribute: Object,
         metadata: Object,
-        attrbute_name: String,
-        disabled: Boolean,
-        entityId: Number,
+        attrname: String,
         model: String,
-        content_id: Number,
-        steps: Object
+        contentId: Number,
     },
     data() {
         return {
@@ -56,13 +49,8 @@ export default {
         };
     },
     mounted() {
-        this.ralation_name = this.metadata.label
-        this.init(this.content_id)
-        this.$dragging.$on('dragged', ({ value }) => {
-        })
-        this.$dragging.$on('dragend', () => {
-
-        })
+        this.ralation_name = this.metadata.edit.label
+        this.init(this.contentId)
     },
     watch: {
         selects() {
@@ -125,8 +113,8 @@ export default {
                 }
             }
         },
-        init(content_id) {
-            get_ralation_list(this.model, this.attrbute_name, content_id, 1, 20, data => {
+        init(contentId) {
+            get_ralation_list(this.model, this.attrname, contentId, 1, 20, data => {
                 let results = data.results
                 if (results.length > 0) {
                     let items = results.map(item => {
@@ -135,10 +123,10 @@ export default {
                     this.options = items
                 }
 
-                if (content_id) {
-                    get_ralation_list_by_id(this.model, this.attrbute_name, content_id, 1, 20, data => {
+                if (contentId) {
+                    get_ralation_list_by_id(this.model, this.attrname, contentId, 1, 20, data => {
 
-                        if (this.attributes.relation === "manyToMany") {
+                        if (this.attribute.relation === "manyToMany") {
                             let results = data.results
                             let initSelects = []
                             for (let i = results.length - 1; i >= 0; i--) {
@@ -149,7 +137,7 @@ export default {
                             this.selects = deepCopy(initSelects)
                         }
 
-                        if (this.attributes.relation === "manyToOne") {
+                        if (this.attribute.relation === "manyToOne") {
                             let data1 = data.data
                             let initSelects = [
                                 this.get_info(data1)
@@ -166,11 +154,11 @@ export default {
         selectItem(item) {
             let selectIndex = this.options.findIndex(x => x.value === item)
             if (selectIndex !== -1) {
-                if (this.attributes.relation === "manyToMany") {
+                if (this.attribute.relation === "manyToMany") {
                     let selectItem = this.options.splice(selectIndex, 1)
                     this.selects.push(selectItem[0])
                 }
-                if (this.attributes.relation === "manyToOne") {
+                if (this.attribute.relation === "manyToOne") {
                     if (this.selects.length === 0) {
                         let selectItem = this.options.splice(selectIndex, 1)
                         this.selects.push(selectItem[0])
@@ -194,6 +182,12 @@ export default {
                 this.options.push(selectItem[0])
 
             }
+        },
+        validate() {
+            if (this.attribute.required && (!this.selects || this.selects.length === 0)) {
+                return "此项为必填"
+            }
+            return true
         }
     },
     computed: {
