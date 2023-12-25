@@ -7,7 +7,7 @@
       <div>
         <div class="files" v-loading="loaddingFiles">
           <div class="file item" v-for="file in files" v-bind:key="file.id">
-            <el-image style="width: 92px; height: 72px" :src="getThumbnailUrl(file)" :preview-src-list="[file.url]">
+            <el-image fit="contain" style="width: 92px; height: 72px" :src="getThumbnailUrl(file)" :preview-src-list="[file.url]">
             </el-image>
 
             <div class="itemname">

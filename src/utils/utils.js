@@ -72,18 +72,18 @@ function getThumbnailUrl(file) {
     }
 
     if (mimetype.startsWith("video")) {
-        return "https://img.alicdn.com/imgextra/i2/O1CN01YgPBAp1zvunG71HdD_!!6000000006777-2-tps-140-140.png"
+        return require("../assets/image/file/video.png")
     }
 
     if (mimetype.startsWith("audio")) {
-        return "https://img.alicdn.com/imgextra/i2/O1CN01Kpm3PQ1we6XnumP1M_!!6000000006332-2-tps-140-140.png"
+        return require("../assets/image/file/audio.png")
     }
 
     if (mimetype.startsWith("application/vnd") || mimetype.startsWith("text")) {
-        return "https://img.alicdn.com/imgextra/i2/O1CN017vpxdQ27S9zPCPqMD_!!6000000007795-2-tps-140-140.png"
+        return require("../assets/image/file/document.png")
     }
 
-    return "https://img.alicdn.com/imgextra/i3/O1CN01AL5gT51gGiSu2jMbx_!!6000000004115-2-tps-140-140.png"
+    return require("../assets/image/file/file.png")
 }
 
 

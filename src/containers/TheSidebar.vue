@@ -47,7 +47,7 @@ export default {
             {
               _name: "CSidebarNavDropdown",
               name: "工具",
-              icon: "cil-puzzle",
+              icon: "cil-settings",
               items: [
                 {
                   name: "JsonSchema生成",

@@ -33,7 +33,7 @@
           <el-table-column property="mime" label="文件类型" width="100"></el-table-column>
           <el-table-column label="预览" width="120">
             <template slot-scope="scope">
-              <el-image style="width:80px;height: 80px;"
+              <el-image fit="contain" style="width:80px;height: 80px;"
                 :src="getThumbnailUrl(scope.row)" :preview-src-list="scope.row.mime.startsWith('image') ? [scope.row.url] : []" />
             </template>
           </el-table-column>
