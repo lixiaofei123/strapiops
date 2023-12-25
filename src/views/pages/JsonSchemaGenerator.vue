@@ -1,7 +1,7 @@
 <template>
   <div>
     <el-row>
-      <el-col :span="24" :xl="16" style="padding-right: 20px;">
+      <el-col :span="24" :xl="12" style="padding-right: 20px;">
         <el-card>
           <div slot="header">
             创建Json字段
@@ -42,7 +42,7 @@
         <div style="height: 20px;"></div>
 
       </el-col>
-      <el-col :span="24" :xl="8" style="padding-right: 20px;">
+      <el-col :span="24" :xl="12" style="padding-right: 20px;">
         <el-card>
           <div slot="header">
             JSON字段效果预览
