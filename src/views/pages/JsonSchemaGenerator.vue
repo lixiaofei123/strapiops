@@ -40,14 +40,7 @@
           </div>
         </el-card>
         <div style="height: 20px;"></div>
-        <el-card>
-          <div slot="header">
-            JSON结果预览
-          </div>
-          <div style="margin-top: 20px;" v-if="schema">
-            {{ datatext }}
-          </div>
-        </el-card>
+
       </el-col>
       <el-col :span="24" :xl="8" style="padding-right: 20px;">
         <el-card>
@@ -59,6 +52,16 @@
               <ObjectField v-if="schema.type === 'object'" :schema="schema" v-model="data"></ObjectField>
               <ArrayField v-if="schema.type === 'array'" :schema="schema" v-model="data"></ArrayField>
             </el-form>
+          </div>
+        </el-card>
+        <div style="height: 20px;"></div>
+        <el-card>
+          <div slot="header">
+            JSON结果预览
+          </div>
+          <div style="margin-top: 20px;" v-if="schema">
+            <el-input type="textarea" v-model="datatext" :autosize="true" :disabled="true">
+            </el-input>
           </div>
         </el-card>
 
@@ -79,7 +82,7 @@
           <el-input v-model="newfield.name"></el-input>
           <span>数据库存储的名称(建议用英文)</span>
         </el-form-item>
-        <el-form-item label="显示名称" required v-if="schemalist.length > 0">
+        <el-form-item label="显示名称" required>
           <el-input v-model="newfield.label"></el-input>
           <span>网页上显示的名称</span>
         </el-form-item>
@@ -109,7 +112,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { deepCopy } from "../../utils/utils";
 
 import ObjectField from "../components/field/json/ObjectField"
-import ArrayField from "../components/field/json/ObjectField"
+import ArrayField from "../components/field/json/ArrayField"
 
 export default {
   name: "JsonSchemaGenerator",
@@ -132,7 +135,7 @@ export default {
       schemalist: [],
       newfield: {
         name: 'root',
-        label: '根',
+        label: '',
         type: 'object',
         required: false,
         enum: [
@@ -165,7 +168,7 @@ export default {
       return JSON.stringify(this.schema)
     },
     datatext() {
-      return JSON.stringify(this.data)
+      return JSON.stringify(this.data, null, "\t")
     }
   },
   watch: {
@@ -175,7 +178,7 @@ export default {
     clearDialog() {
       this.newfield = {
         name: this.schemalist.length === 0 ? 'root' : '',
-        label: this.schemalist.length === 0 ? '根对象' : '',
+        label: '',
         type: this.schemalist.length === 0 ? 'object' : 'string',
         required: false,
         enum: [
@@ -212,6 +215,11 @@ export default {
       }
       if (this.editSchemaIndex === -1) {
         newfield.properties = {}
+        if(newfield.type === "object"){
+          this.data = {}
+        }else{
+          this.data = []
+        }
         this.schemalist.push(newfield)
       } else {
         let schema = this.schemalist[this.editSchemaIndex]
@@ -287,9 +295,8 @@ export default {
         type: schema.type,
         required: schema.required
       }
-      if (index !== 0) {
-        newschema.label = schema.label
-      }
+      newschema.label = schema.label
+
       let properties = schema.properties
       if (properties) {
         newschema.properties = {}

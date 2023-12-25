@@ -1,9 +1,10 @@
 <template>
-  <div v-if="schema">
+  <div v-if="schema" class="container">
+    {{ schema.label }}
     <div v-for="(value, name) in schema.properties">
       <el-form-item :label="value.label ? value.label : name" :required="value.required" :error="errors[name]">
-        <el-input v-if="value.type === 'string'" v-model="data[name]"></el-input>
-        <el-input v-if="value.type === 'number'" v-model="data[name]" type="number"></el-input>
+        <el-input v-if="value.type === 'string'" v-model="data[name]" style="max-width: 200px;"></el-input>
+        <el-input v-if="value.type === 'number'" v-model="data[name]" type="number" style="max-width: 200px;"></el-input>
         <el-switch v-if="value.type === 'boolean'" v-model="data[name]" active-color="#13ce66" inactive-color="#ff4949">
         </el-switch>
         <el-select v-if="value.type === 'enumeration'" v-model="data[name]">
@@ -15,6 +16,7 @@
         <ArrayField v-if="value.type === 'array'" :schema="value" v-model="data[name]" :ref="name"></ArrayField>
       </el-form-item>
     </div>
+
   </div>
 </template>
 
@@ -54,7 +56,7 @@ export default {
     },
   },
   mounted() {
-
+    
   },
   methods: {
     validate() {
@@ -89,4 +91,6 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

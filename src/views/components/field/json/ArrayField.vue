@@ -40,7 +40,7 @@ export default {
     },
   },
   mounted() {
-
+    
   },
   methods: {
     addNew() {
