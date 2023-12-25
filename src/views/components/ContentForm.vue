@@ -1,28 +1,31 @@
 <template>
-  <div class="wrapper">
-    <el-form ref="form" label-width="140px" v-if="model_layouts">
-      <el-row v-for="(layout, index) in model_layouts" v-bind:key="index">
-        <el-col v-for="attr in layout" v-bind:key="attr.name" :span="24" :xl="attr.size * 2">
-          <!-- <el-form-item v-if="model_attributes[attr.name] && metadatas[attr.name].edit.visible"
-            :label="metadatas[attr.name].edit.label"
-            :required="model_attributes[attr.name].required ? model_attributes[attr.name].required : false"
-            :prop="attr.name"> -->
-
-          <InputField v-if="model_attributes[attr.name].type !== 'component'" :ref="attr.name"
-            :attribute="model_attributes[attr.name]" :metadata="metadatas[attr.name]" v-model="model_value[attr.name]"
-            :attrname="attr.name" :model="model"  :contentId="content_id"
-            >
-          </InputField>
+  <div class="wrapper" :class="{ischild: !main_model}" v-if="model_layouts">
+    <div v-if="!main_model" style="margin-bottom: 20px;">
+      {{metadata.edit.label}}
+    </div>
+    <div v-for="model_value in model_values" v-bind:key="model_value.kid">
+      <el-form ref="form" label-width="140px">
+        <el-row v-for="(layout, index) in model_layouts" v-bind:key="index">
+          <el-col v-for="attr in layout" v-bind:key="attr.name" :span="24" :xl="attr.size * 2">
+            <InputField v-if="model_attributes[attr.name].type !== 'component'" :ref="attr.name"
+              :attribute="model_attributes[attr.name]" :metadata="metadatas[attr.name]" v-model="model_value[attr.name]"
+              :attrname="attr.name" :model="model" :contentId="getcontentid(model_value[attr.name])">
+            </InputField>
 
 
-          <ContentForm v-if="model_attributes[attr.name].type === 'component'" :ref="attr.name" :main_model="false"
-            :model="model_attributes[attr.name].component"
-            :model_attributes="get_component_attr(model_attributes[attr.name].component)"
-            :model_configuration="get_component_configuration(model_attributes[attr.name].component)"
-            :init_model_value="model_value[attr.name]" />
-        </el-col>
-      </el-row>
-    </el-form>
+            <ContentForm v-if="model_attributes[attr.name].type === 'component'" :ref="attr.name" :main_model="false"
+              :model="model_attributes[attr.name].component"
+              :model_attributes="get_component_attr(model_attributes[attr.name].component)"
+              :model_configuration="get_component_configuration(model_attributes[attr.name].component)"
+              :metadata="metadatas[attr.name]"
+              :init_model_value="model_value[attr.name]" :repeatable="model_attributes[attr.name].repeatable" />
+          </el-col>
+        </el-row>
+      </el-form>
+    </div>
+    <el-button @click="addNewForm()" type="primary" v-if="repeatable">
+      添加{{metadata.edit.label}}
+    </el-button>
   </div>
 </template>
 
@@ -32,6 +35,7 @@
 import ContentForm from "./ContentForm.vue"
 import InputField from "./field/InputField.vue"
 import { deepCopy } from "../../utils/utils";
+import { v4 as uuidv4 } from 'uuid';
 
 export default {
   name: "ContentForm",
@@ -41,19 +45,21 @@ export default {
   },
   props: {
     model: String,
-    init_model_value: Object,
+    init_model_value: [Object, Array],
     main_model: Boolean,
     model_attributes: Object,
     model_configuration: Object,
+    repeatable: Boolean,
+    metadata: Object
   },
   data() {
     return {
       fields: [],
       items: [],
-      content_id: undefined,
-      model_value: {},
+      model_values: [],
       metadatas: undefined,
       model_layouts: undefined,
+      default_model_value: {}
     };
   },
   created() {
@@ -69,18 +75,29 @@ export default {
   },
   methods: {
     init_model_layout() {
+      console.log(this.model_configuration)
       let model_attributes = this.model_attributes
-      let model_value = {}
       Object.keys(model_attributes).forEach(k => {
-        model_value[k] = model_attributes[k].default
+        this.default_model_value[k] = model_attributes[k].default
       })
 
-      this.model_value = model_value
-
+      this.model_values = []
       // 如果存在初始值，就更新初始值
       if (this.init_model_value !== undefined) {
-        this.model_value = deepCopy(this.init_model_value)
-        this.content_id = this.init_model_value.id
+
+        if (this.init_model_value instanceof Array) {
+          for (let i = 0; i < this.init_model_value.length; i++) {
+            let model_value = deepCopy(this.init_model_value[i]);
+            model_value.kid = uuidv4()
+            this.model_values.push(model_value)
+          }
+        } else {
+          let init_model_value = deepCopy(this.init_model_value);
+          init_model_value.kid = uuidv4()
+          this.model_values.push(init_model_value)
+        }
+      } else {
+        this.addNewForm()
       }
 
       this.metadatas = this.model_configuration.contentType.metadatas;
@@ -101,33 +118,50 @@ export default {
         }
       }
     },
+    addNewForm() {
+      let default_model_value = deepCopy(this.default_model_value);
+      default_model_value.kid = uuidv4()
+      this.model_values.push(default_model_value)
+    },
     getModelData(resolve, reject) {
       resolve = resolve || function () { }
       reject = reject || function () { }
-      let modeldata = this.model_value;
+      let modeldatas = this.model_values;
       let validate = true
       let ref_keys = Object.keys(this.$refs)
-      for (let i = 0; i < ref_keys.length; i++) {
-        let key = ref_keys[i]
-        if (key !== "form") {
-          if (this.$refs[key].length > 0 && this.$refs[key][0].getModelData) {
-            this.$refs[key][0].getModelData(data => {
-              modeldata[key] = data
-            }, () => {
-              validate = false
-            })
-          }
-          if (this.$refs[key].length > 0 && this.$refs[key][0].validate) {
-            if (!this.$refs[key][0].validate()) {
-              validate = false
+
+      for (let j = 0; j < modeldatas.length; j++) {
+        for (let i = 0; i < ref_keys.length; i++) {
+          let key = ref_keys[i]
+          if (key !== "form") {
+            let ref = this.$refs[key][j]
+            if (ref) {
+              if (ref.getModelData) {
+                ref.getModelData(data => {
+                  modeldatas[j][key] = data
+                }, () => {
+                  validate = false
+                })
+              }
+              if (ref.validate) {
+                if (!ref.validate()) {
+                  validate = false
+                }
+              }
             }
           }
         }
       }
 
+
+
       if (!validate) {
         reject()
       } else {
+        let modeldata = modeldatas
+        if (!this.repeatable) {
+          modeldata = modeldatas[0]
+        }
         if (this.main_model) {
           modeldata.updatedBy = this.user
           modeldata.updatedAt = new Date().toISOString()
@@ -139,6 +173,12 @@ export default {
         resolve(modeldata)
       }
     },
+    getcontentid(item) {
+      if (item instanceof Object) {
+        return item.id
+      }
+      return undefined
+    }
   },
 };
 </script>
@@ -151,6 +191,12 @@ export default {
 .title {
   padding-bottom: 20px;
   text-align: center;
+}
+
+.ischild{
+  border: 2px solid #dedede;
+  padding: 20px;
+  margin-bottom: 20px;
 }
 
 /deep/ .ck-content * {
