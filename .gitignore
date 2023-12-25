@@ -4,6 +4,8 @@ package-lock.json
 /dist
 /coverage
 
+dist*
+
 /tests/e2e/reports/
 selenium-debug.log
 chromedriver.log
