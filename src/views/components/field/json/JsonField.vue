@@ -41,7 +41,7 @@ export default {
   },
   mounted() {
    this.schema = JSON.parse(this.metadata.edit.description)
-   this.$emit("descriptionChanged", "没有描述信息")
+   this.$emit("descriptionChanged", "")
   },
   methods: {
     validate() {

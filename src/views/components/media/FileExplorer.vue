@@ -3,6 +3,7 @@
     <el-card>
       <div slot="header" class="clearfix">
         <span>文件</span>
+        <el-button  style="float: right;"  @click="refreshFileLst()">刷新</el-button>
       </div>
       <div>
         <div class="files" v-loading="loaddingFiles">
@@ -76,6 +77,9 @@ export default {
       }, () => {
         this.loaddingFiles = false
       })
+    },
+    refreshFileLst(){
+      this.loadFilesByPath(this.path, 1)
     }
   },
 };
