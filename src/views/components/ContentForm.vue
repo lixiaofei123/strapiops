@@ -99,7 +99,7 @@ export default {
           this.model_values.push(init_model_value)
         }
       } else {
-        this.addNewForm()
+        this.addNewItem()
       }
 
       this.metadatas = this.model_configuration.contentType.metadatas;
