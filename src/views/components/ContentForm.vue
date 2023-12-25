@@ -77,7 +77,6 @@ export default {
   },
   methods: {
     init_model_layout() {
-      console.log(this.model_configuration)
       let model_attributes = this.model_attributes
       Object.keys(model_attributes).forEach(k => {
         this.default_model_value[k] = model_attributes[k].default
