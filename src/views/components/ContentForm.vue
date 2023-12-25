@@ -1,9 +1,9 @@
 <template>
-  <div class="wrapper" :class="{ischild: !main_model}" v-if="model_layouts">
+  <div class="wrapper" :class="{ ischild: !main_model }" v-if="model_layouts">
     <div v-if="!main_model" style="margin-bottom: 20px;">
-      {{metadata.edit.label}}
+      {{ metadata.edit.label }}
     </div>
-    <div v-for="model_value in model_values" v-bind:key="model_value.kid">
+    <div v-for="(model_value, index) in model_values" v-bind:key="model_value.kid" :class="{ repeatable: repeatable }">
       <el-form ref="form" label-width="140px">
         <el-row v-for="(layout, index) in model_layouts" v-bind:key="index">
           <el-col v-for="attr in layout" v-bind:key="attr.name" :span="24" :xl="attr.size * 2">
@@ -17,14 +17,16 @@
               :model="model_attributes[attr.name].component"
               :model_attributes="get_component_attr(model_attributes[attr.name].component)"
               :model_configuration="get_component_configuration(model_attributes[attr.name].component)"
-              :metadata="metadatas[attr.name]"
-              :init_model_value="model_value[attr.name]" :repeatable="model_attributes[attr.name].repeatable" />
+              :metadata="metadatas[attr.name]" :init_model_value="model_value[attr.name]"
+              :repeatable="model_attributes[attr.name].repeatable" />
           </el-col>
         </el-row>
+
       </el-form>
+      <el-button class="delbtn" type="danger" icon="el-icon-delete" circle  @click="deleteItem(index)" v-if="repeatable"></el-button>
     </div>
-    <el-button @click="addNewForm()" type="primary" v-if="repeatable">
-      添加{{metadata.edit.label}}
+    <el-button @click="addNewItem()" type="primary" v-if="repeatable">
+      添加{{ metadata.edit.label }}
     </el-button>
   </div>
 </template>
@@ -118,10 +120,13 @@ export default {
         }
       }
     },
-    addNewForm() {
+    addNewItem() {
       let default_model_value = deepCopy(this.default_model_value);
       default_model_value.kid = uuidv4()
       this.model_values.push(default_model_value)
+    },
+    deleteItem(index){
+      this.model_values.splice(index, 1)
     },
     getModelData(resolve, reject) {
       resolve = resolve || function () { }
@@ -193,10 +198,23 @@ export default {
   text-align: center;
 }
 
-.ischild{
+.ischild {
   border: 2px solid #dedede;
   padding: 20px;
   margin-bottom: 20px;
+}
+
+.repeatable {
+  background-color: aliceblue;
+  padding: 20px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.delbtn{
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 
 /deep/ .ck-content * {
