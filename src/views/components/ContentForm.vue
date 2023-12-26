@@ -169,6 +169,7 @@ export default {
             if (ref) {
               if (ref.validate) {
                 ref.validate(undefined, () => {
+                  console.log("存在校验失败项")
                   validate = false
                 })
               }

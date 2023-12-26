@@ -1,8 +1,8 @@
 <template>
-  <el-form-item v-if="attribute && metadata.edit.visible" :label="metadata.edit.label"
-    :required="attribute.required" :error="attribute.type !== 'json' ? errText : ''">
-    <StringField v-if="attribute.type === 'string' || attribute.type === 'text'" ref="input" v-model="data" :attribute="attribute"
-      :metadata="metadata">
+  <el-form-item v-if="attribute && metadata.edit.visible" :label="metadata.edit.label" :required="attribute.required"
+    :error="attribute.type !== 'json' ? errText : ''">
+    <StringField v-if="attribute.type === 'string' || attribute.type === 'text'" ref="input" v-model="data"
+      :attribute="attribute" :metadata="metadata">
     </StringField>
     <EmailField v-else-if="attribute.type === 'email'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
@@ -10,9 +10,8 @@
     <PasswordField v-else-if="attribute.type === 'password'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
     </PasswordField>
-    <NumberField v-else-if="attribute.type === 'integer' || attribute.type === 'float' || attribute.type === 'decimal'" 
-      ref="input" v-model="data" :attribute="attribute"
-      :metadata="metadata">
+    <NumberField v-else-if="attribute.type === 'integer' || attribute.type === 'float' || attribute.type === 'decimal'"
+      ref="input" v-model="data" :attribute="attribute" :metadata="metadata">
     </NumberField>
     <BigIntegerField v-else-if="attribute.type === 'biginteger'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
@@ -20,8 +19,8 @@
     <EnumerationField v-else-if="attribute.type === 'enumeration'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
     </EnumerationField>
-    <TimeField v-else-if="attribute.type === 'date' || attribute.type === 'datetime' || attribute.type === 'time'" ref="input" v-model="data" :attribute="attribute"
-      :metadata="metadata">
+    <TimeField v-else-if="attribute.type === 'date' || attribute.type === 'datetime' || attribute.type === 'time'"
+      ref="input" v-model="data" :attribute="attribute" :metadata="metadata">
     </TimeField>
     <BooleanField v-else-if="attribute.type === 'boolean'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
@@ -78,7 +77,7 @@ export default {
     JsonField
   },
   props: {
-    value: [String, Object, Array, Number,Boolean],
+    value: [String, Object, Array, Number, Boolean],
     attribute: Object,
     metadata: Object,
     attrname: String,
@@ -100,20 +99,24 @@ export default {
     },
   },
   methods: {
-    validate(){
+    validate(resolve, reject) {
+      resolve = resolve || function () { }
+      reject = reject || function () { }
+
       this.errText = ""
-      if(this.$refs.input && this.$refs.input.validate){
+      if (this.$refs.input && this.$refs.input.validate) {
         let result = this.$refs.input.validate()
-        if(result === true){
-          return true
-        }else{
+        if (result === true) {
+          resolve()
+        } else {
           this.errText = result
-          return false
+          reject()
         }
+      } else {
+        resolve()
       }
-      return true
     },
-    descriptionChanged(newdesc){
+    descriptionChanged(newdesc) {
       this.description = newdesc
     }
   },
