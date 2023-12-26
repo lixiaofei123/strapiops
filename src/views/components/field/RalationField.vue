@@ -6,11 +6,17 @@
             </el-option>
         </el-select>
         <div v-if="selects.length > 0">
-            <el-tag v-for="item in selects" :key="item.label" closable type="info"
-                v-dragging="{ item: item, list: selects, group: attrname }" @close="deleteItem(item)">
-                {{ item.label }}
-            </el-tag>
-
+            <div v-if="metadata.edit.editable">
+                <el-tag v-for="item in selects" :key="item.label" closable type="info"
+                    v-dragging="{ item: item, list: selects, group: attrname }" @close="deleteItem(item)">
+                    {{ item.label }}
+                </el-tag>
+            </div>
+            <div v-else>
+                <el-tag v-for="item in selects" :key="item.label" type="info" style="cursor: not-allowed">
+                    {{ item.label }}
+                </el-tag>
+            </div>
         </div>
 
 
@@ -96,7 +102,7 @@ export default {
             }
             if (!arr1) return false
             if (!arr2) return false
-            
+
 
             return JSON.stringify(arr1) === JSON.stringify(arr2)
         },
@@ -186,12 +192,15 @@ export default {
             }
         },
         deleteItem(item) {
-            let selectIndex = this.selects.findIndex(x => x.value === item.value)
-            if (selectIndex !== -1) {
-                let selectItem = this.selects.splice(selectIndex, 1)
-                this.options.push(selectItem[0])
+            if (this.metadata.edit.editable) {
+                let selectIndex = this.selects.findIndex(x => x.value === item.value)
+                if (selectIndex !== -1) {
+                    let selectItem = this.selects.splice(selectIndex, 1)
+                    this.options.push(selectItem[0])
 
+                }
             }
+
         },
         validate() {
             if (this.attribute.required && (!this.selects || this.selects.length === 0)) {
