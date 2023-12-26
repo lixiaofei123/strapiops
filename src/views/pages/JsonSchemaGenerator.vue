@@ -20,8 +20,9 @@
                 </el-tag>
 
                 <el-tag :type="(value.hover || schema.hover) ? 'danger' : ''" style="margin-right: 10px; cursor: pointer;"
-                  v-for="(value, name) in schema.properties" closable @close="deleteField(index, name)"
-                  @mouseover.native="entertag(value)" @mouseleave.native="leavetag(value)">{{ name }}[{{
+                  v-for="(value, name) in schema.properties" closable @click="editField(index, name)"
+                  @close="deleteField(index, name)" @mouseover.native="entertag(value)"
+                  @mouseleave.native="leavetag(value)">{{ name }}[{{
                     type2name[value.type] }}]({{ value.label }})</el-tag>
                 <el-button class="button-new-tag" size="small"
                   @click="showCreateDialogForAddField(index)">增加字段</el-button>
@@ -79,7 +80,7 @@
           <el-radio v-model="newfield.type" label="array">数组</el-radio>
         </el-form-item>
         <el-form-item label="名称" required v-if="schemalist.length > 0">
-          <el-input v-model="newfield.name"></el-input>
+          <el-input v-model="newfield.name" :disabled="newfield.edit"></el-input>
           <span>数据库存储的名称(建议用英文)</span>
         </el-form-item>
         <el-form-item label="显示名称" required>
@@ -203,6 +204,24 @@ export default {
         this.newfield.enum.splice(index, 1)
       }
     },
+    editField(index, name) {
+      let objfield = this.schemalist[index]
+      if (objfield && objfield.properties && objfield.properties[name]) {
+        let property = objfield.properties[name]
+        this.newfield = {
+          name: name,
+          label: property.label,
+          type: property.type,
+          required: property.required,
+          enum: property.enum,
+          edit: true,
+        }
+
+        this.editSchemaIndex = index
+        this.showCreateDialog = true
+      }
+
+    },
     addNewField() {
       let newfield = {
         id: uuidv4(),
@@ -215,24 +234,42 @@ export default {
       }
       if (this.editSchemaIndex === -1) {
         newfield.properties = {}
-        if(newfield.type === "object"){
+        if (newfield.type === "object") {
           this.data = {}
-        }else{
+        } else {
           this.data = []
         }
         this.schemalist.push(newfield)
       } else {
         let schema = this.schemalist[this.editSchemaIndex]
-        schema.properties[this.newfield.name] = deepCopy(newfield)
+        if (schema.properties[this.newfield.name]) {
+          // 更新值
+          let oldschema = schema.properties[this.newfield.name]
+          let linkedindex = oldschema.index
+          let newfield0 = deepCopy(newfield)
+          newfield0.index = linkedindex
+          schema.properties[this.newfield.name] = deepCopy(newfield0)
 
-        if (newfield.type === 'object' || newfield.type === 'array') {
-          newfield.properties = {}
-          newfield.parentindex = this.editSchemaIndex
-          newfield.fieldname = this.newfield.name
-          this.schemalist.push(newfield)
+          let linkschema = this.schemalist[linkedindex]
+          linkschema.label = newfield0.label
+          linkschema.required = newfield0.required
+
+          this.$set(this.schemalist, this.editSchemaIndex, schema)
+          this.$set(this.schemalist, this.linkedindex, linkschema)
+
+        } else {
+          schema.properties[this.newfield.name] = deepCopy(newfield)
+
+          if (newfield.type === 'object' || newfield.type === 'array') {
+            newfield.properties = {}
+            newfield.parentindex = this.editSchemaIndex
+            newfield.fieldname = this.newfield.name
+            this.schemalist.push(newfield)
+          }
+          schema.properties[this.newfield.name].index = this.schemalist.length - 1
+          this.$set(this.schemalist, this.editSchemaIndex, schema)
         }
-        schema.properties[this.newfield.name].index = this.schemalist.length - 1
-        this.$set(this.schemalist, this.editSchemaIndex, schema)
+
 
       }
 
