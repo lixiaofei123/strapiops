@@ -57,39 +57,49 @@ export default {
             let disconnect = []
             let connect = []
 
-            for (let i = 0; i < this.initSelects.length; i++) {
-                let find = this.selects.findIndex(x => x.value === this.initSelects[i].value)
-                if (find === -1) {
-                    disconnect.push({
-                        id: this.initSelects[i].value
-                    })
+            if (!this.arrayIsEqual(this.selects, this.initSelects)) {
+                for (let i = 0; i < this.initSelects.length; i++) {
+                    let find = this.selects.findIndex(x => x.value === this.initSelects[i].value)
+                    if (find === -1) {
+                        disconnect.push({
+                            id: this.initSelects[i].value
+                        })
+                    }
                 }
-            }
-            for (let i = this.selects.length - 1; i >= 0; i--) {
-                if (i === this.selects.length - 1) {
-                    connect.push({
-                        id: this.selects[i].value,
-                        position: { end: true }
-                    })
-                } else {
-                    connect.push({
-                        id: this.selects[i].value,
-                        position: { before: this.selects[i + 1].value }
-                    })
+                for (let i = this.selects.length - 1; i >= 0; i--) {
+                    if (i === this.selects.length - 1) {
+                        connect.push({
+                            id: this.selects[i].value,
+                            position: { end: true }
+                        })
+                    } else {
+                        connect.push({
+                            id: this.selects[i].value,
+                            position: { before: this.selects[i + 1].value }
+                        })
+                    }
                 }
+
+                let steps = {
+                    disconnect: disconnect,
+                    connect: connect
+                }
+
+                this.$emit("change", steps);
             }
-
-            let steps = {
-                disconnect: disconnect,
-                connect: connect
-            }
-
-            this.$emit("change", steps);
-
-            //this.$emit("", steps)
         }
     },
     methods: {
+        arrayIsEqual(arr1, arr2) {
+            if (!arr1 && !arr2) {
+                return true
+            }
+            if (!arr1) return false
+            if (!arr2) return false
+            
+
+            return JSON.stringify(arr1) === JSON.stringify(arr2)
+        },
         get_info(obj) {
             let keys = Object.keys(obj)
             let main_key_index = keys.findIndex(name => name !== "id" && name !== "publishedAt")

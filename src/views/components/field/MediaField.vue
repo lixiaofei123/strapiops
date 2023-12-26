@@ -323,7 +323,7 @@ export default {
   },
   watch: {
     savedata(newval) {
-      this.$emit("change", newval);
+      this.$emit("change", this.attribute.multiple ? newval : (newval[0] ? newval[0] : undefined));
     }
   }
 };

@@ -9,7 +9,7 @@
           <el-col v-for="attr in layout" v-bind:key="attr.name" :span="24" :xl="attr.size * 2">
             <InputField v-if="model_attributes[attr.name].type !== 'component'" :ref="attr.name"
               :attribute="model_attributes[attr.name]" :metadata="metadatas[attr.name]" v-model="model_value[attr.name]"
-              :attrname="attr.name" :model="model" :contentId="getcontentid(model_value[attr.name])">
+              :attrname="attr.name" :model="model" :contentId="getcontentid(model_value)">
             </InputField>
 
 
@@ -17,13 +17,14 @@
               :model="model_attributes[attr.name].component"
               :model_attributes="get_component_attr(model_attributes[attr.name].component)"
               :model_configuration="get_component_configuration(model_attributes[attr.name].component)"
-              :metadata="metadatas[attr.name]" :init_model_value="model_value[attr.name]"
+              :metadata="metadatas[attr.name]" v-model="model_value[attr.name]"
               :repeatable="model_attributes[attr.name].repeatable" />
           </el-col>
         </el-row>
 
       </el-form>
-      <el-button class="delbtn" type="danger" icon="el-icon-delete" circle  @click="deleteItem(index)" v-if="repeatable"></el-button>
+      <el-button class="delbtn" type="danger" icon="el-icon-delete" circle @click="deleteItem(index)"
+        v-if="repeatable"></el-button>
     </div>
     <el-button @click="addNewItem()" type="primary" v-if="repeatable">
       添加{{ metadata.edit.label }}
@@ -41,13 +42,18 @@ import { v4 as uuidv4 } from 'uuid';
 
 export default {
   name: "ContentForm",
+  props: ["value"],
+  model: {
+    prop: "value",
+    event: "change"
+  },
   components: {
     ContentForm,
     InputField
   },
   props: {
     model: String,
-    init_model_value: [Object, Array],
+    value: [Object, Array],
     main_model: Boolean,
     model_attributes: Object,
     model_configuration: Object,
@@ -64,16 +70,36 @@ export default {
       default_model_value: {}
     };
   },
-  created() {
+  mounted() {
     this.init_model_layout()
   },
   computed: {
     user() {
       return this.$store.state.user
-    }
+    },
+    save_model_value() {
+      let modeldata = this.model_values;
+      if (modeldata) {
+        modeldata.map(x => delete x.kid)
+        if (this.repeatable !== true) {
+          modeldata = modeldata[0]
+        }
+
+      }
+
+      return modeldata
+    },
   },
   watch: {
-
+    // save_model_value: {
+    //   deep: true,
+    //   handler(newval) {
+    //     this.$emit("change", newval);
+    //   }
+    // },
+    save_model_value(newval){
+      this.$emit("change", newval);
+    },
   },
   methods: {
     init_model_layout() {
@@ -84,18 +110,18 @@ export default {
 
       this.model_values = []
       // 如果存在初始值，就更新初始值
-      if (this.init_model_value !== undefined) {
+      if (this.value !== undefined) {
 
-        if (this.init_model_value instanceof Array) {
-          for (let i = 0; i < this.init_model_value.length; i++) {
-            let model_value = deepCopy(this.init_model_value[i]);
+        if (this.value instanceof Array) {
+          for (let i = 0; i < this.value.length; i++) {
+            let model_value = deepCopy(this.value[i]);
             model_value.kid = uuidv4()
             this.model_values.push(model_value)
           }
         } else {
-          let init_model_value = deepCopy(this.init_model_value);
-          init_model_value.kid = uuidv4()
-          this.model_values.push(init_model_value)
+          let value = deepCopy(this.value);
+          value.kid = uuidv4()
+          this.model_values.push(value)
         }
       } else {
         this.addNewItem()
@@ -124,12 +150,13 @@ export default {
       default_model_value.kid = uuidv4()
       this.model_values.push(default_model_value)
     },
-    deleteItem(index){
+    deleteItem(index) {
       this.model_values.splice(index, 1)
     },
-    getModelData(resolve, reject) {
+    validate(resolve, reject) {
       resolve = resolve || function () { }
       reject = reject || function () { }
+
       let modeldatas = this.model_values;
       let validate = true
       let ref_keys = Object.keys(this.$refs)
@@ -140,41 +167,20 @@ export default {
           if (key !== "form") {
             let ref = this.$refs[key][j]
             if (ref) {
-              if (ref.getModelData) {
-                ref.getModelData(data => {
-                  modeldatas[j][key] = data
-                }, () => {
+              if (ref.validate) {
+                ref.validate(undefined, () => {
                   validate = false
                 })
-              }
-              if (ref.validate) {
-                if (!ref.validate()) {
-                  validate = false
-                }
               }
             }
           }
         }
       }
 
-
-
-      if (!validate) {
-        reject()
+      if (validate) {
+        resolve()
       } else {
-        let modeldata = modeldatas
-        if (!this.repeatable) {
-          modeldata = modeldatas[0]
-        }
-        if (this.main_model) {
-          modeldata.updatedBy = this.user
-          modeldata.updatedAt = new Date().toISOString()
-          if (!modeldata.createdAt) {
-            modeldata.createdAt = this.user
-            modeldata.createdBy = new Date().toISOString()
-          }
-        }
-        resolve(modeldata)
+        reject()
       }
     },
     getcontentid(item) {
@@ -210,7 +216,7 @@ export default {
   position: relative;
 }
 
-.delbtn{
+.delbtn {
   position: absolute;
   top: 20px;
   right: 20px;

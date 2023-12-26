@@ -41,7 +41,6 @@ export default {
   },
   mounted() {
     this.schema = JSON.parse(this.metadata.edit.description)
-    console.log(this.data)
     if (this.schema && this.data) {
       let check = this.checkDataWithSchema(this.schema, this.data)
       if (check) {

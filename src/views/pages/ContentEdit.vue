@@ -5,41 +5,42 @@
         <el-card class="card">
           <div slot="header">
             <span v-if="model_info">{{ model_info.displayName }}</span>
-            <el-button :disabled="!ready || saving" style="float: right"  type="primary" @click="saveModelData()">保存</el-button>
+            <el-button :disabled="!ready || saving" style="float: right" type="primary"
+              @click="saveModelData()">保存</el-button>
           </div>
           <div style="min-height: 300px;" v-loading="!ready || saving">
-            <ContentForm v-if="ready" ref="form" :model="model" :init_model_value="init_model_value" :main_model="true"
-            :model_attributes="model_attributes" :model_configuration="model_configuration">
-          </ContentForm>
+            <ContentForm v-if="ready" ref="form" :model="model" v-model="model_value" :main_model="true"
+              :model_attributes="model_attributes" :model_configuration="model_configuration">
+            </ContentForm>
           </div>
-         
+
         </el-card>
       </el-col>
       <el-col :span="24" :xl="5">
-        <el-card  v-if="init_model_value">
+        <el-card v-if="model_value">
           <el-descriptions title="数据信息" direction="horizontal" :column="1" border>
-            <el-descriptions-item label="创建者" v-if="init_model_value.createdBy">{{ init_model_value.createdBy.firstname
+            <el-descriptions-item label="创建者" v-if="model_value.createdBy">{{ model_value.createdBy.firstname
             }}
-              {{ init_model_value.createdBy.lastname }}</el-descriptions-item>
-            <el-descriptions-item label="创建时间" v-if="init_model_value.createdAt">{{
-              beautify_iso_time(init_model_value.createdAt)
+              {{ model_value.createdBy.lastname }}</el-descriptions-item>
+            <el-descriptions-item label="创建时间" v-if="model_value.createdAt">{{
+              beautify_iso_time(model_value.createdAt)
             }}</el-descriptions-item>
-            <el-descriptions-item label="上次更新者" v-if="init_model_value.updatedBy">{{
-              init_model_value.updatedBy.firstname }}
-              {{ init_model_value.updatedBy.lastname }}</el-descriptions-item>
-            <el-descriptions-item label="上次更新时间" v-if="init_model_value.updatedAt">{{
-              beautify_iso_time(init_model_value.updatedAt) }}</el-descriptions-item>
-            <el-descriptions-item label="发布时间" v-if="init_model_value.publishedAt">{{
-              beautify_iso_time(init_model_value.publishedAt) }}</el-descriptions-item>
+            <el-descriptions-item label="上次更新者" v-if="model_value.updatedBy">{{
+              model_value.updatedBy.firstname }}
+              {{ model_value.updatedBy.lastname }}</el-descriptions-item>
+            <el-descriptions-item label="上次更新时间" v-if="model_value.updatedAt">{{
+              beautify_iso_time(model_value.updatedAt) }}</el-descriptions-item>
+            <el-descriptions-item label="发布时间" v-if="model_value.publishedAt">{{
+              beautify_iso_time(model_value.publishedAt) }}</el-descriptions-item>
           </el-descriptions>
         </el-card>
         <div style="height: 20px;"></div>
         <el-card v-if="model_info">
-          <el-button v-if="permission.read" @click="gotoList()" style="width:100%">
+          <el-button v-if="permission.read" @click="confirmContentSave(gotoList)" style="width:100%">
             返回{{ model_info.displayName }}列表
           </el-button>
           <div style="height: 20px;"></div>
-          <el-button v-if="itemid && permission.create" @click="gotoNew()" style="width:100%" type="primary">
+          <el-button v-if="itemid && permission.create" @click="confirmContentSave(gotoNew)" style="width:100%" type="primary">
             新建{{ model_info.displayName }}
           </el-button>
         </el-card>
@@ -54,7 +55,7 @@
 
 import { get_content_configuration, save_model_data, get_content_by_id, update_content_by_id } from "../../api/api";
 import ContentForm from "../components/ContentForm.vue"
-import { beautify_iso_time } from "../../utils/utils"
+import { beautify_iso_time, deepCopy } from "../../utils/utils"
 
 export default {
   name: "Content",
@@ -64,6 +65,7 @@ export default {
   data() {
     return {
       model: undefined,
+      model_value: undefined,
       init_model_value: undefined,
       ready: false,
       saving: false,
@@ -115,13 +117,13 @@ export default {
           ])
         }
       }
-    },
+    }
   },
   methods: {
     clear() {
       this.ready = false
       this.model = undefined
-      this.init_model_value = undefined
+      this.model_value = undefined
       this.model_configuration = undefined
       this.model_attribute = undefined
       this.model_info = undefined
@@ -144,14 +146,15 @@ export default {
           this.model_configuration = data.data
           if (this.itemid) {
             get_content_by_id(this.model, this.itemid, data => {
-              this.init_model_value = data
+              this.model_value = data
               this.ready = true
+              this.init_model_value = JSON.stringify(data)
             })
           } else {
+            this.init_model_value = ""
             this.ready = true
           }
         })
-
 
       } else {
         setTimeout(() => {
@@ -173,23 +176,42 @@ export default {
     gotoNew() {
       this.$router.push({ path: `/contentEdit?model=${this.model}` });
     },
+    confirmContentSave(callback){
+      callback = callback || function(){}
+      if(this.model_value){
+        let model_value = JSON.stringify(this.model_value)
+        if(model_value === this.init_model_value){
+          callback()
+        }else{
+          this.$confirm(`是否放弃当前修改?`).then(() => {
+            callback()
+          },()=>{})
+        }
+      }else{
+        callback()
+      }
+    },
     beautify_iso_time(iostime) {
       return beautify_iso_time(iostime)
     },
-    saveModelData(){
+    saveModelData() {
       this.saving = true
-      this.saveModelData0(()=>{
+      this.saveModelData0(() => {
+        this.init_model_value = JSON.stringify(this.model_value)
         this.saving = false
-      },()=>{
+      }, () => {
         this.saving = false
       })
     },
-    saveModelData0(resolve,reject) {
-      resolve = resolve || function(){}
-      reject = reject || function(){}
-      this.$refs['form'].getModelData(data => {
+    saveModelData0(resolve, reject) {
+      resolve = resolve || function () { }
+      reject = reject || function () { }
+      this.$refs['form'].validate(() => {
         if (this.itemid) {
-          update_content_by_id(this.model, this.itemid, data, () => {
+          let modeldata = deepCopy(this.model_value)
+          modeldata.createdAt = this.user
+          modeldata.createdBy = new Date().toISOString()
+          update_content_by_id(this.model, this.itemid, modeldata, () => {
             resolve()
             this.$notify({
               title: '成功',
@@ -204,7 +226,10 @@ export default {
             });
           })
         } else {
-          save_model_data(this.model, data, data => {
+          let modeldata = deepCopy(this.model_value)
+          modeldata.updatedBy = this.user
+          modeldata.updatedAt = new Date().toISOString()
+          save_model_data(this.model, modeldata, data => {
             resolve()
             this.$notify({
               title: '成功',
