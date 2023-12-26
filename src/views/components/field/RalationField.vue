@@ -155,7 +155,7 @@ export default {
                             this.selects = deepCopy(initSelects)
                         }
 
-                        if (this.attribute.relation === "manyToOne" || this.attribute.relation === "oneToOne") {
+                        if (this.attribute.relation === "manyToOne" || this.attribute.relation === "oneToOne" ) {
                             let data1 = data.data
                             let initSelects = [
                                 this.get_info(data1)
@@ -172,11 +172,11 @@ export default {
         selectItem(item) {
             let selectIndex = this.options.findIndex(x => x.value === item)
             if (selectIndex !== -1) {
-                if (this.attribute.relation === "manyToMany") {
+                if (this.attribute.relation === "manyToMany" || this.attribute.relation === "oneToMany") {
                     let selectItem = this.options.splice(selectIndex, 1)
                     this.selects.push(selectItem[0])
                 }
-                if (this.attribute.relation === "manyToOne") {
+                if (this.attribute.relation === "manyToOne" || this.attribute.relation === "oneToOne" ) {
                     if (this.selects.length === 0) {
                         let selectItem = this.options.splice(selectIndex, 1)
                         this.selects.push(selectItem[0])
