@@ -14,7 +14,8 @@
                 v-if="schemalist.length === 0">点击创建Schema</el-button>
               <div v-for="(schema, index) in valid_schemalist" v-bind:key="schema.id" style="margin-bottom: 20px;">
                 <el-tag :type="schema.hover ? 'danger' : ''" style="margin-right: 10px; cursor: pointer;"
-                  @mouseover.native="enterField(schema)" @mouseleave.native="leaveField(schema)">{{ schema.label }} [{{
+                  @click="editField(schema.parentindex, schema.fieldname)" @mouseover.native="enterField(schema)"
+                  @mouseleave.native="leaveField(schema)">{{ schema.label }} [{{
                     type2name[schema.type] }}]
 
                 </el-tag>
@@ -72,14 +73,14 @@
     <el-dialog title="创建字段" :visible="showCreateDialog">
       <el-form label-width="120px">
         <el-form-item label="类型">
-          <el-radio v-if="schemalist.length > 0" v-model="newfield.type" label="string">字符串</el-radio>
-          <el-radio v-if="schemalist.length > 0" v-model="newfield.type" label="number">数字</el-radio>
-          <el-radio v-if="schemalist.length > 0" v-model="newfield.type" label="boolean">布尔</el-radio>
-          <el-radio v-if="schemalist.length > 0" v-model="newfield.type" label="enumeration">枚举</el-radio>
+          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type" label="string">字符串</el-radio>
+          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type" label="number">数字</el-radio>
+          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type" label="boolean">布尔</el-radio>
+          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type" label="enumeration">枚举</el-radio>
           <el-radio v-model="newfield.type" label="object">对象</el-radio>
           <el-radio v-model="newfield.type" label="array">数组</el-radio>
         </el-form-item>
-        <el-form-item label="名称" required v-if="schemalist.length > 0">
+        <el-form-item label="名称" required v-if="schemalist.length > 0  && !newfield.editroot">
           <el-input v-model="newfield.name" :disabled="newfield.edit"></el-input>
           <span>数据库存储的名称(建议用英文)</span>
         </el-form-item>
@@ -173,7 +174,9 @@ export default {
     }
   },
   watch: {
-
+    schemetext(){
+      this.data = undefined
+    }
   },
   methods: {
     clearDialog() {
@@ -205,21 +208,38 @@ export default {
       }
     },
     editField(index, name) {
-      let objfield = this.schemalist[index]
-      if (objfield && objfield.properties && objfield.properties[name]) {
-        let property = objfield.properties[name]
+      if (index !== undefined) {
+        let objfield = this.schemalist[index]
+        if (objfield && objfield.properties && objfield.properties[name]) {
+          let property = objfield.properties[name]
+          this.newfield = {
+            name: name,
+            label: property.label,
+            type: property.type,
+            required: property.required,
+            enum: property.enum,
+            edit: true,
+          }
+
+          this.editSchemaIndex = index
+          this.showCreateDialog = true
+        }
+      } else {
+        // 编辑root
+        let objfield = this.schemalist[0]
         this.newfield = {
-          name: name,
-          label: property.label,
-          type: property.type,
-          required: property.required,
-          enum: property.enum,
+          name: "",
+          label: objfield.label,
+          type: objfield.type,
+          required: objfield.required,
           edit: true,
+          editroot: true
         }
 
-        this.editSchemaIndex = index
+        this.editSchemaIndex = -1
         this.showCreateDialog = true
       }
+
 
     },
     addNewField() {
@@ -233,13 +253,23 @@ export default {
         newfield.enum = this.newfield.enum
       }
       if (this.editSchemaIndex === -1) {
-        newfield.properties = {}
-        if (newfield.type === "object") {
-          this.data = {}
+        let schema = this.schemalist[0]
+        if (schema) {
+          // 更新模式
+          schema.label = newfield.label
+          schema.required = newfield.required
+          schema.type = newfield.type
+          this.$set(this.schemalist, 0, schema)
         } else {
-          this.data = []
+          newfield.properties = {}
+          if (newfield.type === "object") {
+            this.data = {}
+          } else {
+            this.data = []
+          }
+          this.schemalist.push(newfield)
         }
-        this.schemalist.push(newfield)
+
       } else {
         let schema = this.schemalist[this.editSchemaIndex]
         if (schema.properties[this.newfield.name]) {
@@ -253,6 +283,7 @@ export default {
           let linkschema = this.schemalist[linkedindex]
           linkschema.label = newfield0.label
           linkschema.required = newfield0.required
+          linkschema.type === newfield0.type
 
           this.$set(this.schemalist, this.editSchemaIndex, schema)
           this.$set(this.schemalist, this.linkedindex, linkschema)
