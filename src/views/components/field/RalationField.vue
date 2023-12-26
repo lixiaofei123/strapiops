@@ -7,13 +7,13 @@
         </el-select>
         <div v-if="selects.length > 0">
             <div v-if="metadata.edit.editable">
-                <el-tag v-for="item in selects" :key="item.label" closable type="info"
+                <el-tag v-for="item in selects" :key="item.id" closable type="info"
                     v-dragging="{ item: item, list: selects, group: attrname }" @close="deleteItem(item)">
                     {{ item.label }}
                 </el-tag>
             </div>
             <div v-else>
-                <el-tag v-for="item in selects" :key="item.label" type="info" style="cursor: not-allowed">
+                <el-tag v-for="item in selects" :key="item.id" type="info" style="cursor: not-allowed">
                     {{ item.label }}
                 </el-tag>
             </div>
@@ -142,7 +142,9 @@ export default {
                 if (contentId) {
                     get_ralation_list_by_id(this.model, this.attrname, contentId, 1, 20, data => {
 
-                        if (this.attribute.relation === "manyToMany") {
+                        console.log(this.attribute.relation)
+
+                        if (this.attribute.relation === "manyToMany" || this.attribute.relation === "oneToMany") {
                             let results = data.results
                             let initSelects = []
                             for (let i = results.length - 1; i >= 0; i--) {
@@ -153,7 +155,7 @@ export default {
                             this.selects = deepCopy(initSelects)
                         }
 
-                        if (this.attribute.relation === "manyToOne") {
+                        if (this.attribute.relation === "manyToOne" || this.attribute.relation === "oneToOne") {
                             let data1 = data.data
                             let initSelects = [
                                 this.get_info(data1)
