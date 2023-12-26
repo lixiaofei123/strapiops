@@ -16,7 +16,7 @@
 
         </el-card>
       </el-col>
-      <el-col :span="24" :xl="5">
+      <el-col :span="24" :xl="5" style="padding-right: 20px;">
         <el-card v-if="model_value">
           <el-descriptions title="数据信息" direction="horizontal" :column="1" border>
             <el-descriptions-item label="创建者" v-if="model_value.createdBy">{{ model_value.createdBy.firstname
