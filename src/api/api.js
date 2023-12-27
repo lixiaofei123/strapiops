@@ -164,8 +164,13 @@ function save_model_data(model, modeldata, resolve, reject) {
 function get_content_by_id(model, id, resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
+
+  let url = `${config.url}/content-manager/single-types/${model}`
+  if (id) {
+    url = `${config.url}/content-manager/collection-types/${model}/${id}`
+  }
   axios
-    .get(`${config.url}/content-manager/collection-types/${model}/${id}`)
+    .get(url)
     .then((resp) => resolve(resp.data))
     .catch((err) => reject(err));
 }
@@ -285,7 +290,7 @@ function list_files(parentpath, page, pageCount, resolve, reject) {
     .catch((err) => reject(err));
 }
 
-function get_folder_by_id(folderid, resolve, reject){
+function get_folder_by_id(folderid, resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
   let url = `${config.url}/upload/folders/${folderid}`
@@ -296,7 +301,7 @@ function get_folder_by_id(folderid, resolve, reject){
     .catch((err) => reject(err));
 }
 
-function delete_by_id(fileid, resolve, reject){
+function delete_by_id(fileid, resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
   let url = `${config.url}/upload/files/${fileid}`
@@ -307,7 +312,7 @@ function delete_by_id(fileid, resolve, reject){
     .catch((err) => reject(err));
 }
 
-function folder_structure(resolve, reject){
+function folder_structure(resolve, reject) {
   resolve = resolve || function () { };
   reject = reject || function () { };
   let url = `${config.url}/upload/folder-structure`

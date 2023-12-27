@@ -38,7 +38,15 @@ export default {
             },
             {
               _name: "CSidebarNavDropdown",
-              name: "内容管理",
+              name: "内容集合",
+              icon: "cil-list",
+              items: [
+
+              ],
+            },
+            {
+              _name: "CSidebarNavDropdown",
+              name: "单项内容",
               icon: "cil-puzzle",
               items: [
 
@@ -69,7 +77,7 @@ export default {
       get_content_init(data => {
         let content_types = data.data.contentTypes
         let models = content_types.filter(item => {
-          return (permissions[item.uid] && permissions[item.uid].read) && item.isDisplayed
+          return (permissions[item.uid] && permissions[item.uid].read) && item.isDisplayed && item.kind === "collectionType"
         }).map(item => {
           return {
             name: item.info.displayName,
@@ -77,6 +85,19 @@ export default {
           }
         })
         this.admin_nav[0]["_children"][1].items = models
+
+        let singletype_models = content_types.filter(item => {
+          return (permissions[item.uid] && permissions[item.uid].read) && item.isDisplayed && item.kind === "singleType"
+        }).map(item => {
+          return {
+            name: item.info.displayName,
+            to: `/contentEdit?model=${item.uid}`,
+          }
+        })
+        this.admin_nav[0]["_children"][2].items = singletype_models
+
+
+
         if (permissions["upload"] && permissions["upload"].read) {
           this.admin_nav[0]["_children"].push(
             {

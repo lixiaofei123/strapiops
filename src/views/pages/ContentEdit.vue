@@ -5,8 +5,12 @@
         <el-card class="card">
           <div slot="header">
             <span v-if="model_info">{{ model_info.displayName }}</span>
-            <el-button :disabled="!ready || saving" style="float: right" type="primary"
+            <el-button :disabled="!ready || saving" style="float: right;margin-left:20px" type="primary"
               @click="saveModelData()">保存</el-button>
+            <el-button v-if="this.itemid && this.canPublish && !model_value.publishedAt" style="float: right" @click="publishContent(true)"
+              type="primary">发布</el-button>
+            <el-button v-if="this.itemid && this.canPublish && model_value.publishedAt" style="float: right" type="danger"
+              @click="publishContent(false)">取消发布</el-button>
           </div>
           <div style="min-height: 300px;" v-loading="!ready || saving">
             <ContentForm v-if="ready" ref="form" :model="model" v-model="model_value" :main_model="true"
@@ -35,12 +39,13 @@
           </el-descriptions>
         </el-card>
         <div style="height: 20px;"></div>
-        <el-card v-if="model_info">
+        <el-card v-if="model_info && kind !== 'singleType'">
           <el-button v-if="permission.read" @click="confirmContentSave(gotoList)" style="width:100%">
             返回{{ model_info.displayName }}列表
           </el-button>
           <div style="height: 20px;"></div>
-          <el-button v-if="itemid && permission.create" @click="confirmContentSave(gotoNew)" style="width:100%" type="primary">
+          <el-button v-if="itemid && permission.create" @click="confirmContentSave(gotoNew)" style="width:100%"
+            type="primary">
             新建{{ model_info.displayName }}
           </el-button>
         </el-card>
@@ -53,7 +58,7 @@
 
 <script>
 
-import { get_content_configuration, save_model_data, get_content_by_id, update_content_by_id } from "../../api/api";
+import { get_content_configuration, save_model_data, get_content_by_id, update_content_by_id, publish_content } from "../../api/api";
 import ContentForm from "../components/ContentForm.vue"
 import { beautify_iso_time, deepCopy } from "../../utils/utils"
 
@@ -74,6 +79,8 @@ export default {
       model_attributes: undefined,
       itemid: undefined,
       permission: undefined,
+      kind: undefined,
+      canPublish: false
     };
   },
   created() {
@@ -100,21 +107,36 @@ export default {
       immediate: true,
       handler(newval) {
         if (newval) {
-          this.$store.commit('setNavs', [
-            {
-              active: true,
-              name: "内容管理"
-            },
-            {
-              to: `#/content?model=${this.model}`,
-              name: newval.displayName + "列表"
-            },
+          if (this.kind === 'singleType') {
+            this.$store.commit('setNavs', [
+              {
+                active: true,
+                name: "内容管理"
+              },
 
-            {
-              active: true,
-              name: "编辑"
-            }
-          ])
+              {
+                active: true,
+                name: "编辑"
+              }
+            ])
+          } else {
+            this.$store.commit('setNavs', [
+              {
+                active: true,
+                name: "内容管理"
+              },
+              {
+                to: `#/content?model=${this.model}`,
+                name: newval.displayName + "列表"
+              },
+
+              {
+                active: true,
+                name: "编辑"
+              }
+            ])
+          }
+
         }
       }
     }
@@ -141,18 +163,29 @@ export default {
 
         this.model_info = contenttype.info
         this.model_attributes = contenttype.attributes
+        this.kind = contenttype.kind
+        if(contenttype.options){
+          this.canPublish = contenttype.options.draftAndPublish
+        }
         // 获取布局和元信息
         this.content_configuration(data => {
           this.model_configuration = data.data
-          if (this.itemid) {
+          if (this.itemid || contenttype.kind === 'singleType') {
             get_content_by_id(this.model, this.itemid, data => {
+              this.itemid = data.id
               this.model_value = data
               this.ready = true
               this.init_model_value = JSON.stringify(data)
+            }, () => {
+              // 加载不到数据，就变成新增模式
+              this.itemid = undefined
+              this.init_model_value = ""
+              this.ready = true
             })
           } else {
             this.init_model_value = ""
             this.ready = true
+
           }
         })
 
@@ -176,18 +209,18 @@ export default {
     gotoNew() {
       this.$router.push({ path: `/contentEdit?model=${this.model}` });
     },
-    confirmContentSave(callback){
-      callback = callback || function(){}
-      if(this.model_value){
+    confirmContentSave(callback) {
+      callback = callback || function () { }
+      if (this.model_value) {
         let model_value = JSON.stringify(this.model_value)
-        if(model_value === this.init_model_value){
+        if (model_value === this.init_model_value) {
           callback()
-        }else{
+        } else {
           this.$confirm(`是否放弃当前修改?`).then(() => {
             callback()
-          },()=>{})
+          }, () => { })
         }
-      }else{
+      } else {
         callback()
       }
     },
@@ -254,6 +287,25 @@ export default {
           message: `表单校验失败`,
         });
       })
+
+    },
+    publishContent(publish) {
+      if (this.itemid) {
+        publish_content(this.model, this.itemid, publish, () => {
+          this.$notify({
+            title: '成功',
+            message: `${publish ? '发布' : '取消发布'}成功`,
+            type: 'success'
+          });
+          this.model_value.publishedAt = publish ? new Date().toISOString() : null
+        }, () => {
+          this.$notify({
+            title: "通知",
+            message: `${publish ? '发布' : '取消发布'}失败`,
+          });
+
+        })
+      }
 
     },
   },
