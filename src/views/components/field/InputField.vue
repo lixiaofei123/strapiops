@@ -19,9 +19,15 @@
     <EnumerationField v-else-if="attribute.type === 'enumeration'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
     </EnumerationField>
-    <TimeField v-else-if="attribute.type === 'date' || attribute.type === 'datetime' || attribute.type === 'time'"
+    <TimeField v-else-if="attribute.type === 'time'"
       ref="input" v-model="data" :attribute="attribute" :metadata="metadata">
     </TimeField>
+    <DateField v-else-if="attribute.type === 'date'"
+      ref="input" v-model="data" :attribute="attribute" :metadata="metadata">
+    </DateField>
+    <DateTimeField v-else-if="attribute.type === 'datetime'"
+      ref="input" v-model="data" :attribute="attribute" :metadata="metadata">
+    </DateTimeField>
     <BooleanField v-else-if="attribute.type === 'boolean'" ref="input" v-model="data" :attribute="attribute"
       :metadata="metadata">
     </BooleanField>
@@ -50,6 +56,8 @@ import NumberField from "./NumberField"
 import BigIntegerField from "./BigIntegerField"
 import EnumerationField from "./EnumerationField"
 import TimeField from "./TimeField"
+import DateTimeField from "./DateTimeField"
+import DateField from "./DateField"
 import BooleanField from "./BooleanField"
 import RichTextField from "./RichTextField"
 import MediaField from "./MediaField"
@@ -70,6 +78,8 @@ export default {
     BigIntegerField,
     EnumerationField,
     TimeField,
+    DateField,
+    DateTimeField,
     BooleanField,
     RichTextField,
     MediaField,

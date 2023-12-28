@@ -1,14 +1,15 @@
 <template>
-  <el-time-picker v-if="attribute && metadata" v-model="data" :type="attribute.type"
-    :placeholder="metadata.edit.placeholder" value-format="HH:mm:ss" :disabled="!metadata.edit.editable">
-  </el-time-picker>
+  <el-date-picker v-if="attribute && metadata"
+    v-model="data" :type="attribute.type" :placeholder="metadata.edit.placeholder"
+    :disabled="!metadata.edit.editable">
+  </el-date-picker>
 </template>
 
 <script>
 
 
 export default {
-  name: "TimeField",
+  name: "DateTimeField",
   props: ["value"],
   model: {
     prop: "value",
@@ -24,12 +25,17 @@ export default {
   },
   data() {
     return {
-      data: this.value,
+      data: this.value ? Date.parse(this.value) : undefined,
     };
   },
   watch: {
     data(newval) {
-      this.$emit("change", newval);
+      if(newval){
+        this.$emit("change", newval.toISOString());
+      }else{
+        this.$emit("change", undefined);
+      }
+      
     },
   },
   mounted() {
