@@ -11,7 +11,7 @@
       </CHeaderNavItem>
     </CHeaderNav>
     <CHeaderBrand class="mx-auto" to="/">
-      <h2>内容管理运营系统</h2>
+      <h2>内容管理系统</h2>
     </CHeaderBrand>
     <CHeaderNav class="mr-4">
       <TheHeaderDropdownAccnt :user="user" @logout="logout" />
