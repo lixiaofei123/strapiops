@@ -84,7 +84,7 @@ export default {
       }
       check_strapi_url(this.strapiurl, () => {
         this.isChecking = false
-        cookies.set("strapiurl", this.strapiurl, "99r");
+        cookies.set("strapiurl", this.strapiurl, "99y");
         this.step = 2
       }, err => {
         this.isChecking = false
