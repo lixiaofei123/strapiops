@@ -141,9 +141,6 @@ export default {
 
                 if (contentId) {
                     get_ralation_list_by_id(this.model, this.attrname, contentId, 1, 20, data => {
-
-                        console.log(this.attribute.relation)
-
                         if (this.attribute.relation === "manyToMany" || this.attribute.relation === "oneToMany") {
                             let results = data.results
                             let initSelects = []

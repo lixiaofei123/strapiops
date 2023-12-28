@@ -44,7 +44,6 @@ export default {
     if (this.schema && this.data) {
       let check = this.checkDataWithSchema(this.schema, this.data)
       if (check) {
-        console.log("符合规则")
       } else {
         this.$message.error(`${this.metadata.edit.label}的值不匹配设置的schema，本次保存将会覆盖旧值`);
         this.data = undefined

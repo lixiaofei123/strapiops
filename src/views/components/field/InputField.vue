@@ -1,6 +1,6 @@
 <template>
   <el-form-item v-if="attribute && metadata.edit.visible" :label="metadata.edit.label" :required="attribute.required"
-    :error="attribute.type !== 'json' ? errText : ''">
+    :error="errText">
     <StringField v-if="attribute.type === 'string' || attribute.type === 'text'" ref="input" v-model="data"
       :attribute="attribute" :metadata="metadata">
     </StringField>
@@ -17,7 +17,7 @@
       :metadata="metadata">
     </BigIntegerField>
     <EnumerationField v-else-if="attribute.type === 'enumeration'" ref="input" v-model="data" :attribute="attribute"
-      :metadata="metadata">
+      :metadata="metadata" @descriptionChanged="descriptionChanged">
     </EnumerationField>
     <TimeField v-else-if="attribute.type === 'time'"
       ref="input" v-model="data" :attribute="attribute" :metadata="metadata">

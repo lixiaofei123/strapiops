@@ -43,6 +43,8 @@ export default {
     let labels = description.split(";")
     if(labels.length !== enums.length){
       labels = enums
+    }else{
+      this.$emit("descriptionChanged", "")
     }
     this.enums = enums
     this.labels = labels
