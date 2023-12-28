@@ -1,7 +1,7 @@
 <template>
   <div v-if="schema" class="container">
     {{ schema.label }}
-    <div v-for="(value, name) in schema.properties">
+    <div v-for="(value, name) in schema.properties" v-bind:key="name">
       <el-form-item :label="value.label ? value.label : name" :required="value.required" :error="errors[name]">
         <el-input v-if="value.type === 'string'" v-model="data[name]" style="max-width: 200px;"></el-input>
         <el-input v-if="value.type === 'number'" v-model="data[name]" type="number" style="max-width: 200px;"></el-input>

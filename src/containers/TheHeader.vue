@@ -11,7 +11,7 @@
       </CHeaderNavItem>
     </CHeaderNav>
     <CHeaderBrand class="mx-auto" to="/">
-      <img name="logo" height="40" alt="Logo" :src="require('@/assets/image/logo_main.png')" />
+      <h2>内容管理运营系统</h2>
     </CHeaderBrand>
     <CHeaderNav class="mr-4">
       <TheHeaderDropdownAccnt :user="user" @logout="logout" />

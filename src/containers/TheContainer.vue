@@ -1,5 +1,5 @@
 <template>
-  <div class="c-app">
+  <div class="c-app" v-if="install">
     <TheSidebar v-if="permissions" :stat="stat" :permissions="permissions" />
     <CWrapper>
       <TheHeader :stat="stat" />
@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import { refresh_token, myInfo, get_permissions, search_folders, create_folder} from "../api/api";
-import {get_today_string} from "../utils/utils"
+import { set_strapi_url, refresh_token, myInfo, get_permissions, search_folders, create_folder } from "../api/api";
+import { get_today_string } from "../utils/utils"
 import TheSidebar from "./TheSidebar";
 import TheHeader from "./TheHeader";
 import TheFooter from "./TheFooter";
@@ -36,23 +36,38 @@ export default {
       user: {},
       stat: {},
       permissions: undefined,
+      install: false
     };
   },
   created() {
-    this.loadInfo(() => {
-      let today = get_today_string()
-      this.createUploadFolder(undefined, `strapiadmin/model/${today}`, model => {
-        this.createUploadFolder(undefined, `strapiadmin/editor/${today}`, editor => {
-          this.$store.commit('setUploadFoler', {
-            model: model,
-            editor: editor
-          })
+    this.checkStrapiConfig(() => {
+      this.install = true
+      this.loadInfo(() => {
+        let today = get_today_string()
+        this.createUploadFolder(undefined, `strapiadmin/model/${today}`, model => {
+          this.createUploadFolder(undefined, `strapiadmin/editor/${today}`, editor => {
+            this.$store.commit('setUploadFoler', {
+              model: model,
+              editor: editor
+            })
 
+          })
         })
-      })
-    });
+      });
+    })
+
   },
   methods: {
+    checkStrapiConfig(resolve) {
+      var cookies = require("vue-cookie");
+      let strapiurl = cookies.get("strapiurl")
+      if (strapiurl) {
+        set_strapi_url(strapiurl)
+        resolve()
+      } else {
+        window.location = "#/install";
+      }
+    },
     loadInfo(success) {
       success = success || function () { }
       refresh_token(() => {

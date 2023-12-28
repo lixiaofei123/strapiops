@@ -1,13 +1,13 @@
 <template>
   <div>
-    <el-row>
-      <el-col :span="24" :xl="12" style="padding-right: 20px;">
+    <el-row :gutter="20">
+      <el-col :span="24" :lg="16" :xl="12">
         <el-card>
           <div slot="header">
             创建Json字段
           </div>
           <div>
-            <el-alert title="这里是一段关于创建Json字段Schema的作用描述" type="info">
+            <el-alert title="创建字段后将生成的schema设置为json字段的描述,便可以可视化编辑JSON字段" type="info">
             </el-alert>
             <div style="margin-top: 20px;">
               <el-button type="text" @click="showCreateDialog = true"
@@ -21,7 +21,7 @@
                 </el-tag>
 
                 <el-tag :type="(value.hover || schema.hover) ? 'danger' : ''" style="margin-right: 10px; cursor: pointer;"
-                  v-for="(value, name) in schema.properties" closable @click="editField(index, name)"
+                  v-for="(value, name) in schema.properties" v-bind:key="name" closable @click="editField(index, name)"
                   @close="deleteField(index, name)" @mouseover.native="entertag(value)"
                   @mouseleave.native="leavetag(value)">{{ name }}[{{
                     type2name[value.type] }}]({{ value.label }})</el-tag>
@@ -44,7 +44,7 @@
         <div style="height: 20px;"></div>
 
       </el-col>
-      <el-col :span="24" :xl="12" style="padding-right: 20px;">
+      <el-col :span="24" :lg="8" :xl="12">
         <el-card>
           <div slot="header">
             JSON字段效果预览
@@ -73,14 +73,18 @@
     <el-dialog title="创建字段" :visible="showCreateDialog">
       <el-form label-width="120px">
         <el-form-item label="类型">
-          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type" label="string">字符串</el-radio>
-          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type" label="number">数字</el-radio>
-          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type" label="boolean">布尔</el-radio>
-          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type" label="enumeration">枚举</el-radio>
+          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type"
+            label="string">字符串</el-radio>
+          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type"
+            label="number">数字</el-radio>
+          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type"
+            label="boolean">布尔</el-radio>
+          <el-radio v-if="schemalist.length > 0 && !newfield.editroot" v-model="newfield.type"
+            label="enumeration">枚举</el-radio>
           <el-radio v-model="newfield.type" label="object">对象</el-radio>
           <el-radio v-model="newfield.type" label="array">数组</el-radio>
         </el-form-item>
-        <el-form-item label="名称" required v-if="schemalist.length > 0  && !newfield.editroot">
+        <el-form-item label="名称" required v-if="schemalist.length > 0 && !newfield.editroot">
           <el-input v-model="newfield.name" :disabled="newfield.edit"></el-input>
           <span>数据库存储的名称(建议用英文)</span>
         </el-form-item>
@@ -174,7 +178,7 @@ export default {
     }
   },
   watch: {
-    schemetext(){
+    schemetext() {
       this.data = undefined
     }
   },
@@ -405,5 +409,4 @@ export default {
 .title {
   padding-bottom: 20px;
   text-align: center;
-}
-</style>
+}</style>

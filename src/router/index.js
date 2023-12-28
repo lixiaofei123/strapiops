@@ -7,6 +7,7 @@ const MediaLibrary = () => import("@/views/pages/MediaLibrary");
 const Content = () => import("@/views/pages/Content");
 const ContentEdit = () => import("@/views/pages/ContentEdit");
 const Login = () => import("@/views/pages/Login");
+const Install = () => import("@/views/pages/Install");
 const JsonSchemaGenerator = () => import("@/views/pages/JsonSchemaGenerator");
 
 Vue.use(Router);
@@ -35,19 +36,19 @@ function configRoutes() {
           path: "dashboard",
           name: "站点面板",
           component: AdminDashboard,
-        },{
+        }, {
           path: "content",
           name: "内容列表",
           component: Content
-        },{
+        }, {
           path: "contentEdit",
           name: "内容编辑",
           component: ContentEdit
-        },{
+        }, {
           path: "mediaLibrary",
           name: "媒体库",
           component: MediaLibrary
-        },{
+        }, {
           path: "jsonSchemaGenerator",
           name: "JsonSchema生成",
           component: JsonSchemaGenerator
@@ -56,20 +57,13 @@ function configRoutes() {
     },
     {
       path: "/login",
-      redirect: "/login",
-      name: "Pages",
-      component: {
-        render(c) {
-          return c("router-view");
-        },
-      },
-      children: [,
-        {
-          path: "/login",
-          name: "Login",
-          component: Login,
-        }
-      ],
+      name: "登录",
+      component: Login,
+    },
+    {
+      path: "/install",
+      name: "安装",
+      component: Install,
     },
   ];
 }

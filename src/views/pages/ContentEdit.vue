@@ -1,7 +1,7 @@
 <template>
-  <div class="wrapper">
-    <el-row>
-      <el-col :span="24" :xl="18" style="padding-right: 20px;">
+  <div>
+    <el-row  :gutter="20">
+      <el-col :span="24" :lg="18">
         <el-card class="card">
           <div slot="header">
             <span v-if="model_info">{{ model_info.displayName }}</span>
@@ -20,7 +20,7 @@
 
         </el-card>
       </el-col>
-      <el-col :span="24" :xl="5" style="padding-right: 20px;">
+      <el-col :span="24" :lg="6">
         <el-card v-if="model_value">
           <el-descriptions title="数据信息" direction="horizontal" :column="1" border>
             <el-descriptions-item label="创建者" v-if="model_value.createdBy">{{ model_value.createdBy.firstname
@@ -313,10 +313,6 @@ export default {
 </script>
 
 <style scoped>
-.piechar {
-  padding: 30px 20px;
-}
-
 .title {
   padding-bottom: 20px;
   text-align: center;

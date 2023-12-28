@@ -2,8 +2,8 @@
   <CSidebar fixed :minimize="minimize" :show="show"
     @update:show="(value) => $store.commit('set', ['sidebarShow', value])">
     <CSidebarBrand class="d-md-down-none" to="/">
-      <img class="c-sidebar-brand-full" :height="35" :src="require('@/assets/image/logo_white.png')" />
-      <img class="c-sidebar-brand-minimized" :height="35" :src="require('@/assets/image/logo_mini_white.png')" />
+      <h3 class="c-sidebar-brand-full">STRAPI OPS</h3>
+      <h3 class="c-sidebar-brand-minimized">OPS</h3>
     </CSidebarBrand>
 
     <CRenderFunction flat :content-to-render="admin_nav" />

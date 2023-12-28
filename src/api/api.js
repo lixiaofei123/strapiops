@@ -1,9 +1,6 @@
 const axios = require("axios");
 var cookies = require("vue-cookie");
 
-const config = {
-  url: window.globalConfig.url,
-};
 
 axios.interceptors.request.use(
   (config) => {
@@ -17,6 +14,8 @@ axios.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
+let config = {}
 
 axios.interceptors.response.use(
   function (response) {
@@ -44,6 +43,9 @@ axios.interceptors.response.use(
 );
 
 
+function set_strapi_url(strapiurl){
+  config.url = strapiurl
+}
 
 function myInfo(resolve, reject) {
   resolve = resolve || function () { };
@@ -323,7 +325,19 @@ function folder_structure(resolve, reject) {
     .catch((err) => reject(err));
 }
 
+function check_strapi_url(strapiurl, resolve, reject) {
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  let url = `${strapiurl}/admin/init`
+
+  axios
+    .get(url)
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
+}
+
 export {
+  set_strapi_url,
   myInfo,
   login,
   refresh_token,
@@ -346,5 +360,6 @@ export {
   list_files,
   get_folder_by_id,
   delete_by_id,
-  folder_structure
+  folder_structure,
+  check_strapi_url
 };
