@@ -76,6 +76,8 @@ export default {
             this.data = undefined
           }
         }
+      }else{
+        this.$message.error(`json schema不合法，默认展示为json编辑模式`);
       }
 
     }
