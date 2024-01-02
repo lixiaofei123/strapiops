@@ -1,13 +1,15 @@
 <template>
   <div v-if="attribute && metadata">
-    <el-input v-model="data" v-if="attribute.type === 'text'" :type="'textarea'" :placeholder="metadata.edit.placeholder"
-      :minlength="attribute.minLength ? attribute.minLength : 0"
-      :maxlength="attribute.maxLength ? attribute.maxLength : ''" :disabled="!metadata.edit.editable">
-    </el-input>
-    <el-input v-model="data" v-else :type="'textarea'" :placeholder="metadata.edit.placeholder"
+    <el-input v-model="data" v-if="attribute.type === 'text'" type="textarea" :placeholder="metadata.edit.placeholder"
       :minlength="attribute.minLength ? attribute.minLength : 0"
       :maxlength="attribute.maxLength ? attribute.maxLength : ''" :disabled="!metadata.edit.editable"
       :rows="5"
+      >
+    </el-input>
+    <el-input v-model="data" v-else  :placeholder="metadata.edit.placeholder"
+      :minlength="attribute.minLength ? attribute.minLength : 0"
+      :maxlength="attribute.maxLength ? attribute.maxLength : ''" :disabled="!metadata.edit.editable"
+      
       >
     </el-input>
   </div>
