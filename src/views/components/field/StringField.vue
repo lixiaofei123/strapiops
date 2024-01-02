@@ -1,8 +1,16 @@
 <template>
-  <el-input v-if="attribute && metadata" v-model="data" :type="attribute.type === 'text' ? 'textarea' : 'text'" :placeholder="metadata.edit.placeholder"
-    :minlength="attribute.minLength ? attribute.minLength : 0" :maxlength="attribute.maxLength ? attribute.maxLength : ''"
-    :disabled="!metadata.edit.editable">
-  </el-input>
+  <div v-if="attribute && metadata">
+    <el-input v-model="data" v-if="attribute.type === 'text'" :type="'textarea'" :placeholder="metadata.edit.placeholder"
+      :minlength="attribute.minLength ? attribute.minLength : 0"
+      :maxlength="attribute.maxLength ? attribute.maxLength : ''" :disabled="!metadata.edit.editable">
+    </el-input>
+    <el-input v-model="data" v-else :type="'textarea'" :placeholder="metadata.edit.placeholder"
+      :minlength="attribute.minLength ? attribute.minLength : 0"
+      :maxlength="attribute.maxLength ? attribute.maxLength : ''" :disabled="!metadata.edit.editable"
+      :rows="5"
+      >
+    </el-input>
+  </div>
 </template>
 
 <script>
@@ -34,8 +42,8 @@ export default {
       this.$emit("change", newval);
     },
   },
-  mounted(){
-    if(this.attribute.regex){
+  mounted() {
+    if (this.attribute.regex) {
       this.regex = new RegExp(this.attribute.regex)
     }
   },
@@ -52,7 +60,7 @@ export default {
         if (this.attribute.maxLength && this.value.length > this.attribute.maxLength) {
           return `字段的长度应该小于${this.attribute.minLength}`
         }
-        if(this.regex && !this.regex.test(this.value)){
+        if (this.regex && !this.regex.test(this.value)) {
           return "不符合正则表达式规则"
         }
       }

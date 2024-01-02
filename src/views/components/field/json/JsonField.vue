@@ -55,7 +55,7 @@ export default {
     data(newval) {
       if (typeof newval === 'string' && this.checkIsJson(newval)) {
         this.$emit("change", JSON.parse(newval));
-      } else if(typeof newval === 'Object'){
+      } else if (typeof newval === 'Object') {
         this.$emit("change", newval);
       }
 
@@ -64,18 +64,20 @@ export default {
   mounted() {
     let description = this.metadata.edit.description
     if (this.checkIsJson(description)) {
-      this.schema = JSON.parse(this.metadata.edit.description)
-      if (this.schema) {
+      let schema = JSON.parse(this.metadata.edit.description)
+      if (this.checkSchema(schema)) {
         this.$emit("descriptionChanged", "")
-      }
-      if (this.schema && this.data) {
-        let check = this.checkDataWithSchema(this.schema, this.data)
-        if (check) {
-        } else {
-          this.$message.error(`${this.metadata.edit.label}的值不匹配设置的schema，本次保存将会覆盖旧值`);
-          this.data = undefined
+        this.schema = schema
+        if (this.data) {
+          let check = this.checkDataWithSchema(this.schema, this.data)
+          if (check) {
+          } else {
+            this.$message.error(`${this.metadata.edit.label}的值不匹配设置的schema，本次保存将会覆盖旧值`);
+            this.data = undefined
+          }
         }
       }
+
     }
   },
   methods: {
@@ -90,9 +92,31 @@ export default {
       }
       return false
     },
-    checkSchema() {
-      // TODO 检查schema是否合法
-      return true
+    checkSchema(field) {
+
+      if (field.type) {
+        if (field.type === 'string' || field.type === 'number' || field.type === 'boolean') {
+          return true
+        }
+
+        if (field.type === 'enumeration' && field.enum instanceof Array && field.enum.length > 0) {
+          return true
+        }
+
+        if ((field.type === 'array' || field.type === 'object') && field.properties && typeof field.properties === 'object') {
+          let check = true
+          Object.keys(field.properties).forEach(key => {
+            let childfield = field.properties[key]
+            if (!this.checkSchema(childfield)) {
+              check = false
+            }
+          })
+          return check
+        }
+
+      }
+
+      return false
     },
     checkDataWithSchema(field, data) {
       // 检查目前的数据是否符合schema
