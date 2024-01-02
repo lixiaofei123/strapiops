@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div >
         <el-select v-model="value" :placeholder="'请选择' + ralation_name" @change="selectItem"
             :disabled="!metadata.edit.editable">
             <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
