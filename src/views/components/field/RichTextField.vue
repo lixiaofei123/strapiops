@@ -44,9 +44,13 @@ export default {
       let folder = this.$store.getters.getEditorFolder()
       if (folder) {
         this.editorConfig = {
-          toolbar: ['bold', 'italic', '|', 'link'],
-          // toolbar: ['bold', 'italic', '|', 'link', 'uploadImage'],
-          // extraPlugins: [this.uploader],
+          toolbar: ['bold', 'italic', '|', 'link', 'uploadImage'],
+          extraPlugins: [function (editor) {
+            let folderid = editor.config._config.folderid
+            editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+              return new UploadAdapter(loader, folderid);
+            };
+          }],
           folderid: folder,
         }
       } else {
@@ -55,12 +59,6 @@ export default {
         }, 100)
       }
 
-    },
-    uploader(editor) {
-      // let folderid = editor.config._config.folderid
-      // editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-      //   return new UploadAdapter(loader, folderid);
-      // };
     },
     validate() {
       if (this.attribute.required && !this.value) {

@@ -55,10 +55,9 @@ export default {
     data(newval) {
       if (typeof newval === 'string' && this.checkIsJson(newval)) {
         this.$emit("change", JSON.parse(newval));
-      } else if (typeof newval === 'Object') {
+      } else if (typeof newval === 'object' || typeof newval === 'array') {
         this.$emit("change", newval);
       }
-
     },
   },
   mounted() {
