@@ -1,12 +1,6 @@
 import { upload } from "../../../api/api";
 
-function getAbsoluteUrl(url){
-    if(url.startsWith("http://") || url.startsWith("https://")){
-        return url
-    }else{
-        return window.url + url
-    }
-}
+
 
 export default class UploadAdapter {
     constructor(loader,folderid) {
@@ -23,7 +17,7 @@ export default class UploadAdapter {
                     this.loader.uploaded = loaded;
                 }, data => { 
                     resolve({
-                        default: getAbsoluteUrl(data[0].url)
+                        default: data[0].url
                     })
                 }, error => {
                     reject(err)
