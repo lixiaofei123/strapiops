@@ -11,7 +11,7 @@
       <div class="previewbox" v-for="item in reverseUploadList" v-bind:key="item.key">
         <div class="filecover">
           <el-image class="preview_image" :src="item.previewurl" fit="scale-down"
-            :preview-src-list="item.type === 'image' ? [item.url] : []"></el-image>
+            :preview-src-list="item.type === 'image' ? [getAbsoluteUrl(item.url)] : []"></el-image>
           <el-progress class="upload_progress" :percentage="item.uploadprogress" :show-text="false"
             v-if="item.uploadprogress !== 101"></el-progress>
           <el-button class="delete_img_btn" type="danger" icon="el-icon-delete" circle v-if="item.uploadprogress === 101"
@@ -42,7 +42,7 @@
 <script>
 import 'cropperjs/dist/cropper.css';
 import { upload } from "../../../api/api";
-import {getThumbnailUrl} from "../../../utils/utils"
+import {getThumbnailUrl,getAbsoluteUrl} from "../../../utils/utils"
 import Cropper from 'cropperjs';
 
 export default {
@@ -235,7 +235,7 @@ export default {
         this.clearUpload()
         uploaditem.uploadprogress = 101
         uploaditem.data = data[0]
-        uploaditem.url = data[0].url
+        uploaditem.url = getAbsoluteUrl(data[0].url)
         this.$set(this.uploadList, index, uploaditem)
       })
     },
@@ -293,7 +293,7 @@ export default {
         let previewItem = {
           key: file.id,
           type: this.getFileType(file),
-          url: file.url,
+          url: getAbsoluteUrl(file.url),
           uploadprogress: 101,
           data: file,
           name: file.name

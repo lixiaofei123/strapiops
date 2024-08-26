@@ -8,7 +8,7 @@
       <div>
         <div class="files" v-loading="loaddingFiles">
           <div class="file item" v-for="file in files" v-bind:key="file.id">
-            <el-image fit="contain" style="width: 92px; height: 72px" :src="getThumbnailUrl(file)" :preview-src-list="[file.url]">
+            <el-image fit="contain" style="width: 92px; height: 72px" :src="getThumbnailUrl(file)" :preview-src-list="[getAbsoluteUrl(file.url)]">
             </el-image>
 
             <div class="itemname">
@@ -28,7 +28,7 @@
 <script>
 
 import { list_files } from "../../../api/api"
-import {getThumbnailUrl} from "../../../utils/utils"
+import {getThumbnailUrl,getAbsoluteUrl} from "../../../utils/utils"
 
 export default {
   name: "FileExplorer",

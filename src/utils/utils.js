@@ -61,13 +61,14 @@ function getThumbnailUrl(file) {
     if (mimetype.startsWith("image")) {
         if (file.formats) {
             let formats = file.formats
-            return formats["thumbnail"] ? formats["thumbnail"].url : (
+            let thumbnailUrl = formats["thumbnail"] ? formats["thumbnail"].url : (
                 formats["small"] ? formats["small"].url : (
                     formats["medium"] ? formats["medium"].url : (
                         formats["large"] ? formats["large"].url : file.url
                     )
                 )
             )
+            return getAbsoluteUrl(thumbnailUrl)
         }
     }
 
@@ -84,6 +85,14 @@ function getThumbnailUrl(file) {
     }
 
     return require("../assets/image/file/file.png")
+}
+
+function getAbsoluteUrl(url){
+    if(url.startsWith("http://") || url.startsWith("https://")){
+        return url
+    }else{
+        return window.url + url
+    }
 }
 
 

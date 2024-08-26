@@ -1,4 +1,5 @@
 import { upload } from "../../../api/api";
+import {getAbsoluteUrl} from "../../../utils/utils"
 
 export default class UploadAdapter {
     constructor(loader,folderid) {
@@ -15,7 +16,7 @@ export default class UploadAdapter {
                     this.loader.uploaded = loaded;
                 }, data => { 
                     resolve({
-                        default: data[0].url
+                        default: getAbsoluteUrl(data[0].url)
                     })
                 }, error => {
                     reject(err)

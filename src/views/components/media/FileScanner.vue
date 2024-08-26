@@ -34,7 +34,7 @@
           <el-table-column label="预览" width="120">
             <template slot-scope="scope">
               <el-image fit="contain" style="width:80px;height: 80px;"
-                :src="getThumbnailUrl(scope.row)" :preview-src-list="scope.row.mime.startsWith('image') ? [scope.row.url] : []" />
+                :src="getThumbnailUrl(scope.row)" :preview-src-list="scope.row.mime.startsWith('image') ? [getAbsoluteUrl(scope.row.url)] : []" />
             </template>
           </el-table-column>
 
@@ -60,7 +60,7 @@
 <script>
 
 import { delete_by_id, list_files_with_related } from "../../../api/api";
-import {getThumbnailUrl} from "../../../utils/utils"
+import {getThumbnailUrl,getAbsoluteUrl} from "../../../utils/utils"
 
 export default {
   name: "FileScanner",

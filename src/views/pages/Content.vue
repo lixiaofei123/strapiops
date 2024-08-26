@@ -36,7 +36,7 @@
 
 import { get_content_configuration, get_content_list, delete_content_by_id, publish_content } from "../../api/api";
 import ContentTable from "../components/ContentTable.vue"
-import { format_timestamp } from "../../utils/utils"
+import { format_timestamp,getAbsoluteUrl } from "../../utils/utils"
 
 export default {
   name: "Content",
@@ -138,12 +138,12 @@ export default {
     },
     get_image_url(result) {
       if (result.formats["thumbnail"]) {
-        return result.formats["thumbnail"].url
+        return getAbsoluteUrl(result.formats["thumbnail"].url)
       }
       if (result.formats["small"]) {
-        return result.formats["small"].url
+        return getAbsoluteUrl(result.formats["small"].url)
       }
-      return result.url
+      return getAbsoluteUrl(result.url)
     },
     get_value(metadata, result) {
 

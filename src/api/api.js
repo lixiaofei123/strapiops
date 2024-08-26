@@ -44,6 +44,7 @@ axios.interceptors.response.use(
 
 
 function set_strapi_url(strapiurl){
+  window.url = strapiurl
   config.url = strapiurl
 }
 

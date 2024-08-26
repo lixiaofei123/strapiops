@@ -12,7 +12,7 @@
             <tr v-for="item in items" v-bind:key="item.id.data">
                 <td v-for="field in fields" v-bind:key="field.key">
                     <el-image fit="contain" class="image" v-if="item[field.key].type === 'image'" :src="item[field.key].data" 
-                        :preview-src-list="[item[field.key].url]" />
+                        :preview-src-list="[getAbsoluteUrl(item[field.key].url)]" />
                     <span v-if="item[field.key].type === 'string'">{{ item[field.key].data }}</span>
                     <div v-if="item[field.key].type === 'array'">
                         <div v-for="(item, index) in item[field.key].data" v-bind:key="index"
@@ -54,6 +54,7 @@
 </template>
   
 <script>
+import { getAbsoluteUrl } from "../../utils/utils.js";
 export default {
     name: "ContentTable",
     props: {
