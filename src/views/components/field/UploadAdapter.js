@@ -1,5 +1,12 @@
 import { upload } from "../../../api/api";
-import {getAbsoluteUrl} from "../../../utils/utils"
+
+function getAbsoluteUrl(url){
+    if(url.startsWith("http://") || url.startsWith("https://")){
+        return url
+    }else{
+        return window.url + url
+    }
+}
 
 export default class UploadAdapter {
     constructor(loader,folderid) {
