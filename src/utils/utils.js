@@ -102,5 +102,6 @@ export {
     beautify_iso_time,
     format_timestamp,
     get_today_string,
-    getThumbnailUrl
+    getThumbnailUrl,
+    getAbsoluteUrl
 }
