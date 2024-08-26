@@ -44,7 +44,8 @@ export default {
       let folder = this.$store.getters.getEditorFolder()
       if (folder) {
         this.editorConfig = {
-          toolbar: ['bold', 'italic', '|', 'link', 'uploadImage'],
+          toolbar: ['bold', 'italic', '|', 'link'],
+          // toolbar: ['bold', 'italic', '|', 'link', 'uploadImage'],
           // extraPlugins: [this.uploader],
           folderid: folder,
         }
