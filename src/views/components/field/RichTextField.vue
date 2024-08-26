@@ -45,7 +45,7 @@ export default {
       if (folder) {
         this.editorConfig = {
           toolbar: ['bold', 'italic', '|', 'link', 'uploadImage'],
-          extraPlugins: [this.uploader],
+          // extraPlugins: [this.uploader],
           folderid: folder,
         }
       } else {
@@ -56,10 +56,10 @@ export default {
 
     },
     uploader(editor) {
-      let folderid = editor.config._config.folderid
-      editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
-        return new UploadAdapter(loader, folderid);
-      };
+      // let folderid = editor.config._config.folderid
+      // editor.plugins.get('FileRepository').createUploadAdapter = (loader) => {
+      //   return new UploadAdapter(loader, folderid);
+      // };
     },
     validate() {
       if (this.attribute.required && !this.value) {
