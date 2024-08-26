@@ -67,6 +67,9 @@ export default {
         };
     },
     methods: {
+        getAbsoluteUrl(url){
+            return getAbsoluteUrl(url)
+        },
         bool_value_changed(item, attrname,newvalue){
             this.$emit("bool_value_changed", item, attrname,newvalue)
         }

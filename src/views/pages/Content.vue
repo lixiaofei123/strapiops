@@ -99,7 +99,10 @@ export default {
       }
     },
   },
-  methods: {
+  methods: {,
+    getAbsoluteUrl(url){
+      return getAbsoluteUrl(url)
+    },
     clear() {
       this.fields = []
       this.items = []

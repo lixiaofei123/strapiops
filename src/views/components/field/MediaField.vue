@@ -308,6 +308,9 @@ export default {
         return "此项为必填"
       }
       return true
+    },
+    getAbsoluteUrl(url){
+      return getAbsoluteUrl(url)
     }
   },
   computed: {

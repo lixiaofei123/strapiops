@@ -66,6 +66,9 @@ export default {
     getThumbnailUrl(file){
       return getThumbnailUrl(file)
     },
+    getAbsoluteUrl(url){
+      return getAbsoluteUrl(url)
+    },
     loadFilesByPath(newval, page) {
       this.page = page
       this.loaddingFiles = true

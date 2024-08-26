@@ -107,6 +107,9 @@ export default {
     getThumbnailUrl(file){
       return getThumbnailUrl(file)
     },
+    getAbsoluteUrl(url){
+      return getAbsoluteUrl(url)
+    },
     showScanUnusedImageDialog() {
       this.showScanUnusedImagesDialog = true
     },
