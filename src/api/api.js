@@ -26,7 +26,7 @@ axios.interceptors.response.use(
       if (error.response.status === 401) {
         let href = window.location.href;
         if (
-          href.indexOf("/login") !== -1
+          href.indexOf("/login") !== -1 || href.indexOf("/jsonSchemaGenerator") !== -1
         ) {
           return Promise.reject(error.response.data);
         } else {
@@ -58,21 +58,15 @@ function myInfo(resolve, reject) {
 }
 
 function login(email, password, resolve, reject) {
-  // resolve = resolve || function () { };
-  // reject = reject || function () { };
-  // axios
-  //   .post(`${config.url}/admin/login`, {
-  //     "email": email,
-  //     "password": password
-  //   })
-  //   .then((resp) => resolve(resp.data))
-  //   .catch((err) => reject(err));
-
-  return {
-    "data": {
-      "token": "xxxxxx"
-    }
-  }
+  resolve = resolve || function () { };
+  reject = reject || function () { };
+  axios
+    .post(`${config.url}/admin/login`, {
+      "email": email,
+      "password": password
+    })
+    .then((resp) => resolve(resp.data))
+    .catch((err) => reject(err));
 }
 
 function refresh_token(resolve, reject) {
