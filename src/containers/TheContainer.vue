@@ -40,6 +40,11 @@ export default {
     };
   },
   created() {
+
+    if(window.location.href.endsWith("jsonSchemaGenerator")){
+      return
+    }
+
     this.checkStrapiConfig(() => {
       this.install = true
       this.loadInfo(() => {
