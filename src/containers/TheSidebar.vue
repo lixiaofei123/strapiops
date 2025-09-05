@@ -69,7 +69,7 @@ export default {
     };
   },
   created() {
-    this.load_content_models()
+    // this.load_content_models()
   },
   methods: {
     load_content_models() {
