@@ -58,15 +58,21 @@ function myInfo(resolve, reject) {
 }
 
 function login(email, password, resolve, reject) {
-  resolve = resolve || function () { };
-  reject = reject || function () { };
-  axios
-    .post(`${config.url}/admin/login`, {
-      "email": email,
-      "password": password
-    })
-    .then((resp) => resolve(resp.data))
-    .catch((err) => reject(err));
+  // resolve = resolve || function () { };
+  // reject = reject || function () { };
+  // axios
+  //   .post(`${config.url}/admin/login`, {
+  //     "email": email,
+  //     "password": password
+  //   })
+  //   .then((resp) => resolve(resp.data))
+  //   .catch((err) => reject(err));
+
+  return {
+    "data": {
+      "token": "xxxxxx"
+    }
+  }
 }
 
 function refresh_token(resolve, reject) {
